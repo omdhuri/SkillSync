@@ -1,20 +1,32 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# SkillSync
 
-# Run and deploy your AI Studio app
-
-This contains everything you need to run your app locally.
-
-View your app in AI Studio: https://ai.studio/apps/02b09ceb-e045-4a77-afee-123247422545
+SkillSync is an AI-powered Career Management System built as a modern web application. It helps users manage their career progression by offering various tools and features ranging from resume building to skill gap analysis and mock interviews.
 
 ## Run Locally
 
 **Prerequisites:**  Node.js
 
-
 1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+   ```bash
+   npm install
+   ```
+2. Set the `GEMINI_API_KEY` in `.env` or `.env.local` to your Google Gemini API key. You can copy the example configuration:
+   ```bash
+   cp .env.example .env
+   ```
+3. Run the application:
+   ```bash
+   npm run dev
+   ```
+
+## Key Features
+- **Dashboard:** Overview of career metrics, goals, and recent activities.
+- **Roadmap:** Visual career path planning and milestone tracking.
+- **Resume Builder:** Craft and format modern resumes quickly.
+- **Aptitude Test:** Evaluate your cognitive and problem-solving skills.
+- **Mock Interview:** Practice interface for simulated job interviews.
+- **Job Suggestions:** Tailored job recommendations based on your profile.
+- **Salary Benchmarking:** Market salary comparisons for various job roles.
+- **Skill Gap Analyzer:** Analyzes user skills against market demands.
+- **Learning Paths:** Suggested resources to bridge identified skill gaps.
+- **ATS Linter:** Resume scoring and feedback system modeled after Applicant Tracking Systems.
