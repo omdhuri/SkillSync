@@ -1,18 +1,39 @@
-import { useState } from 'react';
-import { 
-  User, 
-  Bell, 
-  Shield, 
-  Link as LinkIcon, 
-  Save, 
+import { useState, useEffect } from 'react';
+import {
+  User,
+  Bell,
+  Shield,
+  Link as LinkIcon,
+  Save,
   UploadCloud,
   Github,
   Linkedin,
-  Globe
+  Globe,
+  CheckCircle2
 } from 'lucide-react';
+import { getData, setData, KEYS } from '../lib/storage';
+import type { UserProfile } from '../lib/types';
+
+const DEFAULT_PROFILE: UserProfile = {
+  name: 'Felix Developer',
+  email: 'felix@example.com',
+  phone: '+1 (555) 123-4567',
+  location: 'San Francisco, CA',
+  linkedin: 'linkedin.com/in/felixdev',
+  portfolio: 'felix.dev',
+  bio: 'Frontend developer passionate about building great user experiences with React and Tailwind CSS.',
+  avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix',
+  skills: ['React', 'JavaScript', 'Tailwind CSS', 'HTML', 'CSS', 'Git', 'Redux'],
+  targetRole: 'Frontend Developer',
+};
 
 export function Settings() {
   const [activeTab, setActiveTab] = useState('profile');
+  const [profile, setProfile] = useState<UserProfile>(() =>
+    getData(KEYS.USER_PROFILE, DEFAULT_PROFILE)
+  );
+  const [saved, setSaved] = useState(false);
+  const [skillInput, setSkillInput] = useState('');
 
   const tabs = [
     { id: 'profile', label: 'Profile', icon: User },
@@ -20,6 +41,24 @@ export function Settings() {
     { id: 'notifications', label: 'Notifications', icon: Bell },
     { id: 'integrations', label: 'Integrations', icon: LinkIcon },
   ];
+
+  const handleSave = () => {
+    setData(KEYS.USER_PROFILE, profile);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
+
+  const handleAddSkill = () => {
+    const skill = skillInput.trim();
+    if (skill && !profile.skills.includes(skill)) {
+      setProfile({ ...profile, skills: [...profile.skills, skill] });
+      setSkillInput('');
+    }
+  };
+
+  const handleRemoveSkill = (skill: string) => {
+    setProfile({ ...profile, skills: profile.skills.filter(s => s !== skill) });
+  };
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
@@ -36,11 +75,10 @@ export function Settings() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors ${
-                  activeTab === tab.id
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors ${activeTab === tab.id
                     ? 'bg-indigo-50 text-indigo-700'
                     : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                }`}
+                  }`}
               >
                 <tab.icon className={`w-4 h-4 ${activeTab === tab.id ? 'text-indigo-600' : 'text-slate-400'}`} />
                 {tab.label}
@@ -55,10 +93,10 @@ export function Settings() {
             <div className="space-y-6">
               <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                 <h3 className="text-lg font-semibold text-slate-900 mb-4">Personal Information</h3>
-                
+
                 <div className="flex items-center gap-6 mb-8">
                   <div className="w-20 h-20 rounded-full bg-indigo-100 border border-indigo-200 flex items-center justify-center overflow-hidden">
-                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="User" className="w-full h-full object-cover" />
+                    <img src={profile.avatar} alt="User" className="w-full h-full object-cover" />
                   </div>
                   <div>
                     <button className="bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-medium py-2 px-4 rounded-md text-sm transition-colors flex items-center gap-2 mb-2">
@@ -70,29 +108,123 @@ export function Settings() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">First Name</label>
-                    <input type="text" defaultValue="Felix" className="w-full px-3 py-2 bg-white border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" />
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
+                    <input
+                      type="text"
+                      value={profile.name}
+                      onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                    />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Last Name</label>
-                    <input type="text" defaultValue="Developer" className="w-full px-3 py-2 bg-white border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" />
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Target Role</label>
+                    <input
+                      type="text"
+                      value={profile.targetRole}
+                      onChange={(e) => setProfile({ ...profile, targetRole: e.target.value })}
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                    />
                   </div>
-                  <div className="md:col-span-2">
+                  <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1">Email Address</label>
-                    <input type="email" defaultValue="felix@example.com" className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-md text-sm text-slate-500 cursor-not-allowed" disabled />
-                    <p className="text-xs text-slate-500 mt-1">Email cannot be changed directly. Contact support.</p>
+                    <input
+                      type="email"
+                      value={profile.email}
+                      onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Phone</label>
+                    <input
+                      type="tel"
+                      value={profile.phone}
+                      onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Location</label>
+                    <input
+                      type="text"
+                      value={profile.location}
+                      onChange={(e) => setProfile({ ...profile, location: e.target.value })}
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">LinkedIn</label>
+                    <input
+                      type="text"
+                      value={profile.linkedin}
+                      onChange={(e) => setProfile({ ...profile, linkedin: e.target.value })}
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                    />
                   </div>
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-slate-700 mb-1">Bio</label>
-                    <textarea rows={4} defaultValue="Frontend developer passionate about building great user experiences with React and Tailwind CSS." className="w-full px-3 py-2 bg-white border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 resize-none" />
+                    <textarea
+                      rows={3}
+                      value={profile.bio}
+                      onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 resize-none"
+                    />
                   </div>
                 </div>
+              </div>
 
-                <div className="mt-6 flex justify-end">
-                  <button className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-md text-sm transition-colors flex items-center gap-2">
-                    <Save className="w-4 h-4" /> Save Changes
+              {/* Skills Section */}
+              <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <h3 className="text-lg font-semibold text-slate-900 mb-4">Your Skills</h3>
+                <p className="text-sm text-slate-500 mb-4">These skills are used across SkillSync for AI matching, gap analysis, and job suggestions.</p>
+
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {profile.skills.map((skill) => (
+                    <span
+                      key={skill}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-full text-sm font-medium group"
+                    >
+                      {skill}
+                      <button
+                        onClick={() => handleRemoveSkill(skill)}
+                        className="text-indigo-400 hover:text-rose-500 transition-colors text-xs font-bold"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Add a skill (e.g. TypeScript)"
+                    value={skillInput}
+                    onChange={(e) => setSkillInput(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleAddSkill()}
+                    className="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                  />
+                  <button
+                    onClick={handleAddSkill}
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md text-sm transition-colors"
+                  >
+                    Add
                   </button>
                 </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-3">
+                {saved && (
+                  <span className="flex items-center gap-1.5 text-sm font-medium text-emerald-600 animate-in fade-in">
+                    <CheckCircle2 className="w-4 h-4" /> Saved successfully
+                  </span>
+                )}
+                <button
+                  onClick={handleSave}
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-md text-sm transition-colors flex items-center gap-2"
+                >
+                  <Save className="w-4 h-4" /> Save Changes
+                </button>
               </div>
             </div>
           )}
@@ -134,7 +266,7 @@ export function Settings() {
             <div className="space-y-6">
               <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                 <h3 className="text-lg font-semibold text-slate-900 mb-6">Notification Preferences</h3>
-                
+
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
                     <div>
@@ -146,7 +278,7 @@ export function Settings() {
                       <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
                     </label>
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <div>
                       <h4 className="text-sm font-medium text-slate-900">Learning Reminders</h4>
@@ -168,7 +300,7 @@ export function Settings() {
                       <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
                     </label>
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <div>
                       <h4 className="text-sm font-medium text-slate-900">Marketing Emails</h4>
@@ -188,7 +320,7 @@ export function Settings() {
             <div className="space-y-6">
               <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                 <h3 className="text-lg font-semibold text-slate-900 mb-6">Connected Accounts</h3>
-                
+
                 <div className="space-y-4">
                   {/* GitHub */}
                   <div className="flex items-center justify-between p-4 border border-slate-200 rounded-lg">
@@ -230,7 +362,7 @@ export function Settings() {
                       </div>
                       <div>
                         <h4 className="text-sm font-medium text-slate-900">Personal Portfolio</h4>
-                        <p className="text-xs text-slate-500">felix.dev</p>
+                        <p className="text-xs text-slate-500">{profile.portfolio}</p>
                       </div>
                     </div>
                     <button className="text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors">
