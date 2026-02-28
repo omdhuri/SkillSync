@@ -61,7 +61,10 @@ export function Layout() {
     <div className="h-screen bg-slate-50 flex font-sans text-slate-800 selection:bg-indigo-500/30 overflow-hidden">
       {/* Global Click-Outside Overlay for Dropdowns */}
       {(isNotificationsOpen || isProfileOpen || isSearchFocused) && (
-        <div className="fixed inset-0 z-[35]" onClick={closeAllDropdowns} />
+        <div 
+          className="fixed inset-0 z-[35] bg-slate-900/10 backdrop-blur-sm transition-all duration-300 animate-in fade-in" 
+          onClick={closeAllDropdowns} 
+        />
       )}
 
       {/* Mobile Overlay */}
