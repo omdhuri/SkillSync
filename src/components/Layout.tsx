@@ -61,13 +61,13 @@ export function Layout() {
     <div className="h-screen bg-slate-50 flex font-sans text-slate-800 selection:bg-indigo-500/30 overflow-hidden">
       {/* Global Click-Outside Overlay for Dropdowns */}
       {(isNotificationsOpen || isProfileOpen || isSearchFocused) && (
-        <div className="fixed inset-0 z-40" onClick={closeAllDropdowns} />
+        <div className="fixed inset-0 z-[35]" onClick={closeAllDropdowns} />
       )}
 
       {/* Mobile Overlay */}
       {isSidebarOpen && (
         <div 
-          className="fixed inset-0 bg-slate-900/20 backdrop-blur-sm z-20 md:hidden transition-opacity"
+          className="fixed inset-0 bg-slate-900/20 backdrop-blur-sm z-[50] md:hidden transition-opacity"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
@@ -75,7 +75,7 @@ export function Layout() {
       {/* Sidebar */}
       <aside 
         className={cn(
-          "fixed md:relative inset-y-0 left-0 z-30 flex flex-col bg-white/80 backdrop-blur-xl border-r border-slate-200/60 transition-all duration-300 ease-in-out overflow-hidden",
+          "fixed md:relative inset-y-0 left-0 z-[60] flex flex-col bg-white/80 backdrop-blur-xl border-r border-slate-200/60 transition-all duration-300 ease-in-out overflow-hidden",
           isSidebarOpen 
             ? "w-64 translate-x-0" 
             : "w-64 -translate-x-full md:w-[72px] md:translate-x-0"
@@ -157,7 +157,7 @@ export function Layout() {
         </div>
 
         {/* Top Header */}
-        <header className="h-16 bg-white/60 backdrop-blur-md border-b border-slate-200/60 flex items-center justify-between px-4 sm:px-6 flex-shrink-0 z-10 relative">
+        <header className="h-16 bg-white/60 backdrop-blur-md border-b border-slate-200/60 flex items-center justify-between px-4 sm:px-6 flex-shrink-0 z-[40] relative">
           <div className="flex items-center gap-3">
             <button 
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -289,7 +289,7 @@ export function Layout() {
         </header>
 
         {/* Page Content */}
-        <div className="flex-1 overflow-auto p-6 z-10 relative">
+        <div className="flex-1 overflow-auto p-6 z-0 relative">
           <div className="max-w-6xl mx-auto">
             <Outlet />
           </div>
