@@ -5,6 +5,7 @@ import {
   GraduationCap, Code2, Save, RotateCcw, Award, FolderOpen, Star
 } from 'lucide-react';
 import { PDFDownloadLink } from '@react-pdf/renderer';
+import { TagInput } from '../components/TagInput';
 import { ClassicResumePDF, AcademicResumePDF, ModernResumePDF } from './ResumeBuilderPDF';
 import { getData, setData, KEYS } from '../lib/storage';
 import { enhanceResumeBullets, generateProfessionalSummary } from '../lib/gemini';
@@ -51,7 +52,8 @@ const SAMPLE_DATA: ResumeData = {
   education: [
     {
       id: 1,
-      school: 'University of California, Berkeley',
+      college: 'School of Engineering',
+      university: 'University of California, Berkeley',
       degree: 'B.Tech. Computer Science & Engineering',
       date: 'Aug 2017 – May 2021',
       gpa: '8.7 / 10.0',
@@ -62,16 +64,17 @@ const SAMPLE_DATA: ResumeData = {
       id: 1,
       name: 'DevFlow — AI Code Review Tool',
       description: 'Open-source VS Code extension for automated code review using OpenAI API. 2,000+ installs on the marketplace.',
-      tech: 'TypeScript, VS Code API, OpenAI, Node.js',
-      link: 'github.com/alex/devflow',
+      tech: ['TypeScript', 'VS Code API', 'OpenAI', 'Node.js'],
+      githubUrl: 'alex/devflow',
+      liveUrl: 'marketplace.visualstudio.com/items?itemName=alex.devflow',
       date: 'Jan 2023',
     },
     {
       id: 2,
       name: 'QuickCart — E-Commerce Platform',
       description: 'Full-stack e-commerce app with real-time inventory, Stripe payments, and an admin dashboard.',
-      tech: 'React, Node.js, PostgreSQL, Stripe, Docker',
-      link: 'quickcart.alexjohnson.dev',
+      tech: ['React', 'Node.js', 'PostgreSQL', 'Stripe', 'Docker'],
+      liveUrl: 'quickcart.alexjohnson.dev',
       date: 'Sep 2022',
     },
   ],
@@ -85,11 +88,11 @@ const SAMPLE_DATA: ResumeData = {
   ],
   skills: 'React, TypeScript, JavaScript, Node.js, Python, PostgreSQL, MongoDB, Redis, AWS, Docker, Git, GraphQL, Tailwind CSS, Next.js',
   skillCategories: {
-    languages: 'React, TypeScript, JavaScript, Python, Node.js',
-    frameworks: 'React.js, Next.js, Express.js, Tailwind CSS',
-    cloudDevops: 'AWS (EC2, S3, Lambda), Docker, GitHub Actions, CI/CD',
-    databases: 'PostgreSQL, MongoDB, Redis, MySQL',
-    tools: 'Git, JIRA, Figma, Postman, REST APIs, Agile/Scrum',
+    languages: ['React', 'TypeScript', 'JavaScript', 'Python', 'Node.js'],
+    frameworks: ['React.js', 'Next.js', 'Express.js', 'Tailwind CSS'],
+    cloudDevops: ['AWS (EC2, S3, Lambda)', 'Docker', 'GitHub Actions', 'CI/CD'],
+    databases: ['PostgreSQL', 'MongoDB', 'Redis', 'MySQL'],
+    tools: ['Git', 'JIRA', 'Figma', 'Postman', 'REST APIs', 'Agile/Scrum'],
   },
 };
 
@@ -158,11 +161,11 @@ function generatePrintHTML(data: ResumeData): string {
     ).join('');
 
   const educationHTML = data.education
-    .filter((e) => e.school || e.degree)
+    .filter((e) => e.college || e.degree)
     .map(
       (edu) => `
       <div class="item">
-        <div class="row-between"><span class="bold">${esc(edu.school)}</span><span class="date">${esc(edu.date)}</span></div>
+        <div class="row-between"><span class="bold">${esc(edu.college)}${edu.university ? `, ${esc(edu.university)}` : ''}</span><span class="date">${esc(edu.date)}</span></div>
         <div class="row-between"><span class="italic muted">${esc(edu.degree)}</span>${edu.gpa ? `<span>CGPA: ${esc(edu.gpa)}</span>` : ''}</div>
       </div>`
     ).join('');
@@ -170,11 +173,15 @@ function generatePrintHTML(data: ResumeData): string {
   const projectsHTML = data.projects.filter((p) => p.name).map((p) => `
       <div class="item">
         <div class="row-between">
-          <span class="bold">${esc(p.name)}${p.link ? ` &nbsp;<span class="small-link">${link('https://' + p.link.replace(/^https?:\/\//, ''), p.link)}</span>` : ''}</span>
+          <span class="bold">
+            ${esc(p.name)}
+            ${p.liveUrl ? `<span class="small-link">${link('https://' + p.liveUrl.replace(/^https?:\/\//, ''), 'Live')}</span>` : ''}
+            ${p.githubUrl ? `<span class="small-link">${link('https://' + p.githubUrl.replace(/^https?:\/\//, ''), 'GitHub')}</span>` : ''}
+          </span>
           <span class="date">${esc(p.date ?? '')}</span>
         </div>
         ${p.description ? `<div class="muted">${esc(p.description)}</div>` : ''}
-        ${p.tech ? `<div class="tech">Tech: ${esc(p.tech)}</div>` : ''}
+        ${p.tech && p.tech.length > 0 ? `<div class="tech">Tech: ${esc(p.tech.join(', '))}</div>` : ''}
       </div>`).join('');
 
   const certsHTML = data.certifications.filter((c) => c.name).map((c) => `
@@ -238,7 +245,7 @@ function generatePrintHTML(data: ResumeData): string {
 
     ${data.experience.filter((e) => e.company || e.role).length > 0 ? `<div class="section-title">Experience</div>${experienceHTML}` : ''}
 
-    ${data.education.filter((e) => e.school).length > 0 ? `<div class="section-title">Education</div>${educationHTML}` : ''}
+    ${data.education.filter((e) => e.college).length > 0 ? `<div class="section-title">Education</div>${educationHTML}` : ''}
 
     ${data.projects.filter((p) => p.name).length > 0 ? `<div class="section-title">Projects</div>${projectsHTML}` : ''}
 
@@ -296,8 +303,8 @@ export function ResumeBuilder() {
   // ── PDF export — one-click, clean, via @react-pdf/renderer ──
   // Rendered as PDFDownloadLink in JSX below (no popup needed)
 
-  // ── Skill Categories (Academic template) ──
-  const setSkillCat = (field: keyof SkillCategories, val: string | null) =>
+  // ── Skill Categories ──
+  const setSkillCat = (field: keyof SkillCategories, val: string[] | null) =>
     setResumeData((d) => ({
       ...d,
       skillCategories: val === null
@@ -325,18 +332,18 @@ export function ResumeBuilder() {
 
   // ── Education ──
   const addEducation = () =>
-    setResumeData((d) => ({ ...d, education: [...d.education, { id: nextId(d.education), school: '', degree: '', date: '', gpa: '' }] }));
+    setResumeData((d) => ({ ...d, education: [...d.education, { id: nextId(d.education), college: '', university: '', degree: '', date: '', gpa: '' }] }));
   const removeEducation = (id: number) =>
     setResumeData((d) => ({ ...d, education: d.education.filter((e) => e.id !== id) }));
-  const setEduField = (id: number, field: 'school' | 'degree' | 'date' | 'gpa' | 'coursework', val: string) =>
+  const setEduField = (id: number, field: 'college' | 'university' | 'degree' | 'date' | 'gpa' | 'coursework', val: string) =>
     setResumeData((d) => ({ ...d, education: d.education.map((e) => e.id === id ? { ...e, [field]: val } : e) }));
 
   // ── Projects ──
   const addProject = () =>
-    setResumeData((d) => ({ ...d, projects: [...d.projects, { id: nextId(d.projects), name: '', description: '', tech: '', link: '', date: '' }] }));
+    setResumeData((d) => ({ ...d, projects: [...d.projects, { id: nextId(d.projects), name: '', description: '', tech: [], liveUrl: '', githubUrl: '', date: '' }] }));
   const removeProject = (id: number) =>
     setResumeData((d) => ({ ...d, projects: d.projects.filter((p) => p.id !== id) }));
-  const setProjectField = (id: number, field: keyof ResumeProject, val: string) =>
+  const setProjectField = <K extends keyof ResumeProject>(id: number, field: K, val: ResumeProject[K]) =>
     setResumeData((d) => ({ ...d, projects: d.projects.map((p) => p.id === id ? { ...p, [field]: val } : p) }));
 
   // ── Certifications ──
@@ -536,10 +543,11 @@ export function ResumeBuilder() {
                   <div key={edu.id} className="bg-slate-50 rounded-xl border border-slate-200 p-4 relative group">
                     <button onClick={() => removeEducation(edu.id)} className="absolute top-3 right-3 p-1 text-slate-300 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-all rounded"><Trash2 className="w-4 h-4" /></button>
                     <div className="grid grid-cols-2 gap-3 pr-8">
-                      <div className="col-span-2"><label className={lbl}>School / University</label><input type="text" value={edu.school} onChange={(e) => setEduField(edu.id, 'school', e.target.value)} className={inp} placeholder="e.g. MIT" /></div>
+                      <div><label className={lbl}>College / Institute</label><input type="text" value={edu.college} onChange={(e) => setEduField(edu.id, 'college', e.target.value)} className={inp} placeholder="e.g. School of Engineering" /></div>
+                      <div><label className={lbl}>University <span className="font-normal text-slate-400">(optional)</span></label><input type="text" value={edu.university ?? ''} onChange={(e) => setEduField(edu.id, 'university', e.target.value)} className={inp} placeholder="e.g. MIT" /></div>
                       <div><label className={lbl}>Degree</label><input type="text" value={edu.degree} onChange={(e) => setEduField(edu.id, 'degree', e.target.value)} className={inp} placeholder="e.g. B.Tech. Computer Science" /></div>
                       <div><label className={lbl}>CGPA (optional)</label><input type="text" value={edu.gpa} onChange={(e) => setEduField(edu.id, 'gpa', e.target.value)} className={inp} placeholder="e.g. 8.7 / 10.0" /></div>
-                      <div className="col-span-2"><label className={lbl}>Dates</label><input type="text" value={edu.date} onChange={(e) => setEduField(edu.id, 'date', e.target.value)} className={inp} placeholder="e.g. Aug 2018 – May 2022" /></div>
+                      <div className="col-span-2"><label className={lbl}>Dates</label><input type="text" value={edu.date} onChange={(e) => setEduField(edu.id, 'date', e.target.value)} className={inp} placeholder="e.g. Aug 2021 – Present" /><p className="text-[10px] text-slate-400 mt-0.5">Use "Present" if currently studying</p></div>
                       {template === 'academic' && (
                         <div className="col-span-2">
                           <div className="flex items-center justify-between">
@@ -576,8 +584,12 @@ export function ResumeBuilder() {
                         <div><label className={lbl}>Project Name</label><input type="text" value={proj.name} onChange={(e) => setProjectField(proj.id, 'name', e.target.value)} className={inp} placeholder="e.g. My Awesome App" /></div>
                         <div><label className={lbl}>Date (optional)</label><input type="text" value={proj.date ?? ''} onChange={(e) => setProjectField(proj.id, 'date', e.target.value)} className={inp} placeholder="e.g. Mar 2024" /></div>
                         <div className="col-span-2"><label className={lbl}>Description</label><textarea rows={2} value={proj.description} onChange={(e) => setProjectField(proj.id, 'description', e.target.value)} className={`${inp} resize-none`} placeholder="What it does and your role in it…" /></div>
-                        <div><label className={lbl}>Tech Stack</label><input type="text" value={proj.tech} onChange={(e) => setProjectField(proj.id, 'tech', e.target.value)} className={inp} placeholder="React, Node.js, PostgreSQL" /></div>
-                        <div><label className={lbl}>Link (optional)</label><input type="text" value={proj.link ?? ''} onChange={(e) => setProjectField(proj.id, 'link', e.target.value)} className={inp} placeholder="github.com/you/project" /></div>
+                        <div className="col-span-2">
+                          <label className={lbl}>Tech Stack</label>
+                          <TagInput tags={proj.tech} onChange={(newTags) => setProjectField(proj.id, 'tech', newTags)} placeholder="React, Node.js..." />
+                        </div>
+                        <div><label className={lbl}>Live URL (optional)</label><input type="text" value={proj.liveUrl ?? ''} onChange={(e) => setProjectField(proj.id, 'liveUrl', e.target.value)} className={inp} placeholder="yourapp.com" /></div>
+                        <div><label className={lbl}>GitHub Repo (optional)</label><input type="text" value={proj.githubUrl ?? ''} onChange={(e) => setProjectField(proj.id, 'githubUrl', e.target.value)} className={inp} placeholder="github.com/you/repo" /></div>
                       </div>
                     </div>
                   ))}
@@ -635,40 +647,58 @@ export function ResumeBuilder() {
 
             <Divider />
 
-            {/* Skills — Academic shows categorized, others show flat list */}
+            {/* Skills — Flat list OR Categorized */}
             <Section icon={<Code2 className="w-4 h-4 text-indigo-500" />} title="Technical Skills">
-              {template === 'academic' ? (
-                <div className="space-y-3">
-                  <p className="text-xs text-slate-400">Each category is optional. Click remove to hide it from your resume.</p>
-                  {([
-                    { key: 'languages' as const, label: 'Languages', ph: 'Java, Python, JavaScript, TypeScript…' },
-                    { key: 'frameworks' as const, label: 'Frameworks', ph: 'Spring Boot, React.js, Node.js, Django…' },
-                    { key: 'cloudDevops' as const, label: 'Cloud & DevOps', ph: 'AWS, Docker, Kubernetes, CI/CD…' },
-                    { key: 'databases' as const, label: 'Databases', ph: 'MySQL, MongoDB, PostgreSQL, Redis…' },
-                    { key: 'tools' as const, label: 'Tools & Others', ph: 'Git, JIRA, REST APIs, Agile/Scrum…' },
-                  ]).map(({ key, label, ph }) => {
-                    const val = data.skillCategories?.[key];
-                    const isHidden = val === undefined;
-                    return (
-                      <div key={key}>
-                        <div className="flex items-center justify-between mb-1">
-                          <label className={lbl}>{label}</label>
-                          {isHidden
-                            ? <button onClick={() => setSkillCat(key, '')} className="text-xs text-indigo-500 hover:text-indigo-700">+ Add</button>
-                            : <button onClick={() => setSkillCat(key, null)} className="text-xs text-rose-400 hover:text-rose-600">Remove</button>
-                          }
-                        </div>
-                        {!isHidden && <input type="text" value={val ?? ''} onChange={(e) => setSkillCat(key, e.target.value)} className={inp} placeholder={ph} />}
-                      </div>
-                    );
-                  })}
+              <div className="space-y-4">
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className={lbl}>Flat List <span className="font-normal text-slate-400 lowercase">(Fallback)</span></label>
+                  </div>
+                  <TagInput
+                    tags={data.skills ? data.skills.split(',').map(s => s.trim()).filter(Boolean) : []}
+                    onChange={(tags) => setResumeData(d => ({ ...d, skills: tags.join(', ') }))}
+                    placeholder="React, TypeScript, Node.js..."
+                  />
+                  <p className="text-[10px] text-slate-400 mt-1">Used if no categories are added below.</p>
                 </div>
-              ) : (
-                <>
-                  <p className="text-xs text-slate-400 mb-2">Comma-separated list of your skills.</p>
-                  <textarea value={data.skills} onChange={(e) => setResumeData((d) => ({ ...d, skills: e.target.value }))} rows={3} placeholder="React, TypeScript, Node.js, Python…" className={`${inp} resize-none`} />
-                </>
-              )}
+
+                <div className="pt-4 border-t border-slate-100">
+                  <div className="mb-3">
+                    <label className={lbl}>Categorized Skills</label>
+                    <p className="text-[10px] text-slate-400">If any category is added, it overrides the flat list above.</p>
+                  </div>
+                  <div className="space-y-3">
+                    {([
+                      { key: 'languages' as const, label: 'Languages', ph: 'Java, Python, TypeScript…' },
+                      { key: 'frameworks' as const, label: 'Frameworks', ph: 'React.js, Node.js…' },
+                      { key: 'cloudDevops' as const, label: 'Cloud & DevOps', ph: 'AWS, Docker…' },
+                      { key: 'databases' as const, label: 'Databases', ph: 'MySQL, MongoDB…' },
+                      { key: 'tools' as const, label: 'Tools & Others', ph: 'Git, JIRA…' },
+                    ]).map(({ key, label, ph }) => {
+                      const val = data.skillCategories?.[key];
+                      const isHidden = val === undefined;
+                      return (
+                        <div key={key}>
+                          <div className="flex items-center justify-between mb-1">
+                            <label className={lbl}>{label}</label>
+                            {isHidden
+                              ? <button onClick={() => setSkillCat(key, [])} className="text-xs text-indigo-500 hover:text-indigo-700">+ Add</button>
+                              : <button onClick={() => setSkillCat(key, null)} className="text-xs text-rose-400 hover:text-rose-600">Remove</button>
+                            }
+                          </div>
+                          {!isHidden && (
+                            <TagInput
+                              tags={Array.isArray(val) ? val : (typeof val === 'string' ? val.split(',').map(s => s.trim()).filter(Boolean) : [])}
+                              onChange={(newTags) => setSkillCat(key, newTags)}
+                              placeholder={ph}
+                            />
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
             </Section>
           </div>
         </div>
@@ -710,7 +740,7 @@ function ResumePreview({ data }: { data: ResumeData }) {
   const linkRow = [data.personal.linkedin, data.personal.github, data.personal.portfolio].filter(Boolean);
 
   return (
-    <div className="bg-white shadow-2xl font-serif text-slate-900 overflow-hidden" style={{ width: '100%', aspectRatio: '1 / 1.414', padding: '10mm 12mm', fontSize: '10.5px', lineHeight: '1.5', boxSizing: 'border-box', fontVariant: 'normal' }}>
+    <div className="bg-white shadow-2xl font-serif text-slate-900 overflow-hidden" style={{ width: '100%', aspectRatio: '1 / 1.414', padding: '10mm 12mm', fontSize: '10.5px', lineHeight: '1.5', boxSizing: 'border-box', fontVariant: 'normal', fontVariantNumeric: 'lining-nums' }}>
       {/* Header */}
       <div className="text-center border-b-2 border-slate-900 pb-3 mb-3">
         <h1 className="font-bold tracking-widest uppercase mb-1" style={{ fontSize: '20px', letterSpacing: '0.12em' }}>{data.personal.name || 'Your Name'}</h1>
@@ -750,11 +780,11 @@ function ResumePreview({ data }: { data: ResumeData }) {
       )}
 
       {/* Education */}
-      {data.education.filter((e) => e.school).length > 0 && (
+      {data.education.filter((e) => e.college).length > 0 && (
         <PreviewSection title="Education">
           {data.education.map((edu) => (
             <div key={edu.id} className="mb-1.5">
-              <div className="flex justify-between items-baseline"><span className="font-bold">{edu.school || 'University'}</span><span className="text-slate-500" style={{ fontSize: '9.5px' }}>{edu.date}</span></div>
+              <div className="flex justify-between items-baseline"><span className="font-bold">{edu.college || 'College'}{edu.university ? `, ${edu.university}` : ''}</span><span className="text-slate-500" style={{ fontSize: '9.5px' }}>{edu.date}</span></div>
               <div className="flex justify-between items-baseline text-slate-700"><span className="italic">{edu.degree}</span>{edu.gpa && <span>CGPA: {edu.gpa}</span>}</div>
             </div>
           ))}
@@ -767,11 +797,15 @@ function ResumePreview({ data }: { data: ResumeData }) {
           {data.projects.filter((p) => p.name).map((proj) => (
             <div key={proj.id} className="mb-1.5">
               <div className="flex justify-between items-baseline">
-                <span className="font-bold">{proj.name}{proj.link && <span className="font-normal text-blue-600 underline ml-1.5" style={{ fontSize: '9px' }}>{proj.link}</span>}</span>
+                <span className="font-bold">
+                  {proj.name}
+                  {proj.liveUrl && <span className="font-normal text-blue-600 underline ml-1.5" style={{ fontSize: '9px' }}><a href={`https://${proj.liveUrl}`}>Live</a></span>}
+                  {proj.githubUrl && <span className="font-normal text-blue-600 underline ml-1.5" style={{ fontSize: '9px' }}><a href={`https://${proj.githubUrl}`}>GitHub</a></span>}
+                </span>
                 <span className="text-slate-500" style={{ fontSize: '9.5px' }}>{proj.date}</span>
               </div>
               {proj.description && <div className="text-slate-700">{proj.description}</div>}
-              {proj.tech && <div className="text-slate-500" style={{ fontSize: '9.5px' }}>Tech: {proj.tech}</div>}
+              {proj.tech && proj.tech.length > 0 && <div className="text-slate-500" style={{ fontSize: '9.5px' }}>Tech: {proj.tech.join(', ')}</div>}
             </div>
           ))}
         </PreviewSection>
@@ -799,7 +833,23 @@ function ResumePreview({ data }: { data: ResumeData }) {
       )}
 
       {/* Skills */}
-      {data.skills && <PreviewSection title="Technical Skills"><p className="text-slate-700">{data.skills}</p></PreviewSection>}
+      {(() => {
+        const sc = data.skillCategories;
+        const hasCats = sc && (sc.languages?.length || sc.frameworks?.length || sc.cloudDevops?.length || sc.databases?.length || sc.tools?.length);
+        if (hasCats) return (
+          <PreviewSection title="Technical Skills">
+            <div className="text-slate-700" style={{ fontSize: '9px' }}>
+              {sc.languages?.length ? <div style={{ marginBottom: '1px' }}><span className="font-bold">Languages: </span>{sc.languages.join(', ')}</div> : null}
+              {sc.frameworks?.length ? <div style={{ marginBottom: '1px' }}><span className="font-bold">Frameworks: </span>{sc.frameworks.join(', ')}</div> : null}
+              {sc.cloudDevops?.length ? <div style={{ marginBottom: '1px' }}><span className="font-bold">Cloud & DevOps: </span>{sc.cloudDevops.join(', ')}</div> : null}
+              {sc.databases?.length ? <div style={{ marginBottom: '1px' }}><span className="font-bold">Databases: </span>{sc.databases.join(', ')}</div> : null}
+              {sc.tools?.length ? <div><span className="font-bold">Tools & Others: </span>{sc.tools.join(', ')}</div> : null}
+            </div>
+          </PreviewSection>
+        );
+        if (data.skills) return <PreviewSection title="Technical Skills"><p className="text-slate-700">{data.skills}</p></PreviewSection>;
+        return null;
+      })()}
     </div>
   );
 }
@@ -847,18 +897,18 @@ function AcademicResumePreview({ data }: { data: ResumeData }) {
   const linkParts = [data.personal.linkedin && 'LinkedIn', data.personal.github && 'GitHub', data.personal.portfolio && 'Portfolio'].filter(Boolean).join('  |  ');
   const contactLine = [contacts, linkParts].filter(Boolean).join('  |  ');
 
-  const base: React.CSSProperties = { fontFamily: "'Times New Roman', Georgia, serif", fontSize: '9.5px', lineHeight: '1.45', color: '#111', fontVariant: 'normal' };
-  const secTitle: React.CSSProperties = { fontWeight: 'bold', fontSize: '10.5px', marginTop: '8px', marginBottom: '3px', borderBottom: '0.8px solid #333', paddingBottom: '1px' };
+  const base: React.CSSProperties = { fontFamily: "'Times New Roman', Georgia, serif", fontSize: '10px', lineHeight: '1.45', color: '#111', fontVariant: 'normal' };
+  const secTitle: React.CSSProperties = { fontWeight: 'bold', fontSize: '11px', marginTop: '10px', marginBottom: '4px', borderBottom: '0.8px solid #333', paddingBottom: '1.5px' };
   const row: React.CSSProperties = { display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' };
 
   return (
-    <div style={{ ...base, width: '100%', aspectRatio: '1 / 1.414', padding: '8mm 10mm', boxSizing: 'border-box', background: 'white', overflow: 'hidden' }}>
+    <div style={{ ...base, width: '100%', aspectRatio: '1 / 1.414', padding: '14mm 16mm', boxSizing: 'border-box', background: 'white', overflow: 'hidden' }}>
       {/* Header — centered */}
-      <div style={{ textAlign: 'center', marginBottom: '5px' }}>
-        <div style={{ fontSize: '16px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.07em' }}>{data.personal.name || 'YOUR NAME'}</div>
-        <div style={{ fontSize: '8.5px', color: '#333', marginTop: '2px' }}>{contactLine}</div>
+      <div style={{ textAlign: 'center', marginBottom: '6px' }}>
+        <div style={{ fontSize: '17px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.07em' }}>{data.personal.name || 'YOUR NAME'}</div>
+        <div style={{ fontSize: '9px', color: '#333', marginTop: '3px' }}>{contactLine}</div>
       </div>
-      <hr style={{ border: 'none', borderTop: '1px solid #000', marginBottom: '5px' }} />
+      <hr style={{ border: 'none', borderTop: '1px solid #000', marginBottom: '6px' }} />
 
       {/* Professional Summary */}
       {data.summary && <>
@@ -867,20 +917,19 @@ function AcademicResumePreview({ data }: { data: ResumeData }) {
       </>}
 
       {/* Technical Skills — categorized */}
-      {(sc?.languages || sc?.frameworks || sc?.cloudDevops || sc?.databases || sc?.tools) && <>
+      {(sc?.languages?.length || sc?.frameworks?.length || sc?.cloudDevops?.length || sc?.databases?.length || sc?.tools?.length) ? <>
         <div style={secTitle}>Technical Skills</div>
         <div style={{ fontSize: '9px' }}>
-          {sc.languages && <div style={{ marginBottom: '1px' }}><span style={{ fontWeight: 'bold' }}>Languages: </span>{sc.languages}</div>}
-          {sc.frameworks && <div style={{ marginBottom: '1px' }}><span style={{ fontWeight: 'bold' }}>Frameworks: </span>{sc.frameworks}</div>}
-          {sc.cloudDevops && <div style={{ marginBottom: '1px' }}><span style={{ fontWeight: 'bold' }}>Cloud &amp; DevOps: </span>{sc.cloudDevops}</div>}
-          {sc.databases && <div style={{ marginBottom: '1px' }}><span style={{ fontWeight: 'bold' }}>Databases: </span>{sc.databases}</div>}
-          {sc.tools && <div><span style={{ fontWeight: 'bold' }}>Tools &amp; Others: </span>{sc.tools}</div>}
+          {sc.languages?.length ? <div style={{ marginBottom: '1px' }}><span style={{ fontWeight: 'bold' }}>Languages: </span>{sc.languages.join(', ')}</div> : null}
+          {sc.frameworks?.length ? <div style={{ marginBottom: '1px' }}><span style={{ fontWeight: 'bold' }}>Frameworks: </span>{sc.frameworks.join(', ')}</div> : null}
+          {sc.cloudDevops?.length ? <div style={{ marginBottom: '1px' }}><span style={{ fontWeight: 'bold' }}>Cloud &amp; DevOps: </span>{sc.cloudDevops.join(', ')}</div> : null}
+          {sc.databases?.length ? <div style={{ marginBottom: '1px' }}><span style={{ fontWeight: 'bold' }}>Databases: </span>{sc.databases.join(', ')}</div> : null}
+          {sc.tools?.length ? <div><span style={{ fontWeight: 'bold' }}>Tools &amp; Others: </span>{sc.tools.join(', ')}</div> : null}
         </div>
-      </>}
-      {!sc && data.skills && <>
+      </> : data.skills ? <>
         <div style={secTitle}>Technical Skills</div>
         <p style={{ fontSize: '9px' }}>{data.skills}</p>
-      </>}
+      </> : null}
 
       {/* Professional Experience */}
       {data.experience.filter(e => e.company).length > 0 && <>
@@ -906,26 +955,30 @@ function AcademicResumePreview({ data }: { data: ResumeData }) {
         {data.projects.filter(p => p.name).map(proj => (
           <div key={proj.id} style={{ marginBottom: '4px' }}>
             <div style={row}>
-              <span style={{ fontWeight: 'bold', fontSize: '9.5px' }}>{proj.name}</span>
+              <span style={{ fontWeight: 'bold', fontSize: '9.5px' }}>
+                {proj.name}
+                {proj.liveUrl && <span style={{ fontWeight: 'normal', fontSize: '8.5px', marginLeft: '6px' }}><a href={`https://${proj.liveUrl}`} style={{ color: '#111', textDecoration: 'none' }}>[Live]</a></span>}
+                {proj.githubUrl && <span style={{ fontWeight: 'normal', fontSize: '8.5px', marginLeft: '6px' }}><a href={`https://${proj.githubUrl}`} style={{ color: '#111', textDecoration: 'none' }}>[GitHub]</a></span>}
+              </span>
               <span style={{ fontSize: '8.5px', color: '#555' }}>{proj.date}</span>
             </div>
             {proj.description && <div style={{ fontSize: '9px' }}>{proj.description}</div>}
-            {proj.tech && <div style={{ fontSize: '8.5px', color: '#555' }}>Tech: {proj.tech}</div>}
+            {proj.tech && proj.tech.length > 0 && <div style={{ fontSize: '8.5px', color: '#555' }}>Tech: {proj.tech.join(', ')}</div>}
           </div>
         ))}
       </>}
 
       {/* Education */}
-      {data.education.filter(e => e.school).length > 0 && <>
+      {data.education.filter(e => e.college).length > 0 && <>
         <div style={secTitle}>Education</div>
-        {data.education.filter(e => e.school).map(edu => (
+        {data.education.filter(e => e.college).map(edu => (
           <div key={edu.id} style={{ marginBottom: '4px' }}>
             <div style={row}>
               <span style={{ fontWeight: 'bold', fontSize: '9.5px' }}>{edu.degree}</span>
               <span style={{ fontSize: '8.5px', color: '#555' }}>{edu.date}</span>
             </div>
             <div style={{ fontSize: '9px', fontStyle: 'italic', color: '#444' }}>
-              {edu.school}{edu.gpa ? `  CGPA: ${edu.gpa}` : ''}
+              {edu.college}{edu.university ? `, ${edu.university}` : ''}{edu.gpa ? `  CGPA: ${edu.gpa}` : ''}
             </div>
             {edu.coursework && <div style={{ fontSize: '8.5px', color: '#444' }}>Relevant Coursework: {edu.coursework}</div>}
           </div>
@@ -1003,9 +1056,14 @@ function ModernResumePreview({ data }: { data: ResumeData }) {
                   <span style={{ fontWeight: 'bold', fontSize: '9px' }}>{proj.name}</span>
                   <span style={{ fontSize: '8px', color: '#666' }}>{proj.date}</span>
                 </div>
-                {proj.link && <div style={{ fontSize: '8px', color: '#1a56db', textDecoration: 'underline' }}>{proj.link}</div>}
+                {(proj.liveUrl || proj.githubUrl) && (
+                  <div style={{ display: 'flex', gap: '6px', fontSize: '8px', marginTop: '1px' }}>
+                    {proj.liveUrl && <a href={`https://${proj.liveUrl}`} style={{ color: '#1a56db', textDecoration: 'underline' }}>View Live</a>}
+                    {proj.githubUrl && <a href={`https://${proj.githubUrl}`} style={{ color: '#1a56db', textDecoration: 'underline' }}>GitHub Repo</a>}
+                  </div>
+                )}
                 {proj.description && <div style={{ fontSize: '8px', color: '#333' }}>{proj.description}</div>}
-                {proj.tech && <div style={{ fontSize: '8px', color: '#555', marginTop: '1px' }}>Tech: {proj.tech}</div>}
+                {proj.tech && proj.tech.length > 0 && <div style={{ fontSize: '8px', color: '#555', marginTop: '1px' }}>Tech: {proj.tech.join(', ')}</div>}
               </div>
             ))}
           </>}
@@ -1013,16 +1071,31 @@ function ModernResumePreview({ data }: { data: ResumeData }) {
 
         {/* RIGHT — Skills, Education, Certs, Achievements */}
         <div style={{ flex: '0 0 42%', minWidth: 0, borderLeft: '1px solid #ddd', paddingLeft: '8px' }}>
-          {data.skills && <>
-            <div style={{ ...secStyle, marginTop: 0 }}>Skills</div>
-            <div style={{ fontSize: '8px', color: '#333' }}>{data.skills}</div>
-          </>}
+          {(() => {
+            const sc = data.skillCategories;
+            const hasCats = sc && (sc.languages?.length || sc.frameworks?.length || sc.cloudDevops?.length || sc.databases?.length || sc.tools?.length);
+            if (hasCats) return <>
+              <div style={{ ...secStyle, marginTop: 0 }}>Skills</div>
+              <div style={{ fontSize: '8px', color: '#333' }}>
+                {sc.languages?.length ? <div style={{ marginBottom: '1px' }}><span style={{ fontWeight: 'bold' }}>Languages: </span>{sc.languages.join(', ')}</div> : null}
+                {sc.frameworks?.length ? <div style={{ marginBottom: '1px' }}><span style={{ fontWeight: 'bold' }}>Frameworks: </span>{sc.frameworks.join(', ')}</div> : null}
+                {sc.cloudDevops?.length ? <div style={{ marginBottom: '1px' }}><span style={{ fontWeight: 'bold' }}>Cloud & DevOps: </span>{sc.cloudDevops.join(', ')}</div> : null}
+                {sc.databases?.length ? <div style={{ marginBottom: '1px' }}><span style={{ fontWeight: 'bold' }}>Databases: </span>{sc.databases.join(', ')}</div> : null}
+                {sc.tools?.length ? <div><span style={{ fontWeight: 'bold' }}>Tools & Others: </span>{sc.tools.join(', ')}</div> : null}
+              </div>
+            </>;
+            if (data.skills) return <>
+              <div style={{ ...secStyle, marginTop: 0 }}>Skills</div>
+              <div style={{ fontSize: '8px', color: '#333' }}>{data.skills}</div>
+            </>;
+            return null;
+          })()}
 
-          {data.education.filter(e => e.school).length > 0 && <>
+          {data.education.filter(e => e.college).length > 0 && <>
             <div style={secStyle}>Education</div>
             {data.education.map(edu => (
               <div key={edu.id} style={{ marginBottom: '4px' }}>
-                <div style={{ fontWeight: 'bold', fontSize: '9px' }}>{edu.school}</div>
+                <div style={{ fontWeight: 'bold', fontSize: '9px' }}>{edu.college}{edu.university ? `, ${edu.university}` : ''}</div>
                 <div style={{ fontSize: '8px', fontStyle: 'italic' }}>{edu.degree}</div>
                 <div style={{ fontSize: '8px', color: '#555' }}>{edu.date}{edu.gpa ? ` · CGPA: ${edu.gpa}` : ''}</div>
               </div>
@@ -1086,11 +1159,11 @@ function generateModernHTML(data: ResumeData): string {
     <div class="cols">
       <div class="left">
         ${data.experience.filter(e => e.company).length ? `<div class="sec">Experience</div>${data.experience.filter(e => e.company).map(exp => `<div style="margin-bottom:6px;"><div class="exp-head">${esc(exp.company)} | ${esc(exp.role)}</div><div class="exp-date">${esc(exp.date)}</div><ul>${exp.bullets.filter(b => b.trim()).map(b => `<li>${esc(b)}</li>`).join('')}</ul></div>`).join('')}` : ''}
-        ${data.projects.filter(p => p.name).length ? `<div class="sec">Projects</div>${data.projects.filter(p => p.name).map(p => `<div style="margin-bottom:5px;"><div style="display:flex;justify-content:space-between;"><span class="proj-name">${esc(p.name)}</span><span style="font-size:8px;color:#666;">${esc(p.date ?? '')}</span></div>${p.link ? `<div class="link" style="font-size:8px;">${esc(p.link)}</div>` : ''}${p.description ? `<div style="font-size:8px;color:#333;">${esc(p.description)}</div>` : ''}${p.tech ? `<div style="font-size:8px;color:#555;">Tech: ${esc(p.tech)}</div>` : ''}</div>`).join('')}` : ''}
+        ${data.projects.filter(p => p.name).length ? `<div class="sec">Projects</div>${data.projects.filter(p => p.name).map(p => `<div style="margin-bottom:5px;"><div style="display:flex;justify-content:space-between;"><span class="proj-name">${esc(p.name)}</span><span style="font-size:8px;color:#666;">${esc(p.date ?? '')}</span></div>${(p.liveUrl || p.githubUrl) ? `<div style="display:flex;gap:6px;font-size:8px;margin-top:1px;">${p.liveUrl ? `<a href="https://${esc(p.liveUrl)}" style="color:#1a56db;text-decoration:underline;">View Live</a>` : ''}${p.githubUrl ? `<a href="https://${esc(p.githubUrl)}" style="color:#1a56db;text-decoration:underline;">GitHub Repo</a>` : ''}</div>` : ''}${p.description ? `<div style="font-size:8px;color:#333;">${esc(p.description)}</div>` : ''}${p.tech && p.tech.length > 0 ? `<div style="font-size:8px;color:#555;">Tech: ${esc(p.tech.join(', '))}</div>` : ''}</div>`).join('')}` : ''}
       </div>
       <div class="right">
         ${data.skills ? `<div class="sec sec-first">Skills</div><div style="font-size:8px;color:#333;">${esc(data.skills)}</div>` : ''}
-        ${data.education.filter(e => e.school).length ? `<div class="sec">Education</div>${data.education.filter(e => e.school).map(edu => `<div style="margin-bottom:4px;"><div style="font-weight:bold;font-size:9px;">${esc(edu.school)}</div><div style="font-size:8px;font-style:italic;">${esc(edu.degree)}</div><div style="font-size:8px;color:#555;">${esc(edu.date)}${edu.gpa ? ` · CGPA: ${esc(edu.gpa)}` : ''}</div></div>`).join('')}` : ''}
+        ${data.education.filter(e => e.college).length ? `<div class="sec">Education</div>${data.education.filter(e => e.college).map(edu => `<div style="margin-bottom:4px;"><div style="font-weight:bold;font-size:9px;">${esc(edu.college)}${edu.university ? `, ${esc(edu.university)}` : ''}</div><div style="font-size:8px;font-style:italic;">${esc(edu.degree)}</div><div style="font-size:8px;color:#555;">${esc(edu.date)}${edu.gpa ? ` · CGPA: ${esc(edu.gpa)}` : ''}</div></div>`).join('')}` : ''}
         ${data.certifications.filter(c => c.name).length ? `<div class="sec">Certifications</div>${data.certifications.filter(c => c.name).map(c => `<div style="margin-bottom:3px;"><div style="font-weight:bold;font-size:8.5px;">${esc(c.name)}</div><div style="font-size:8px;color:#555;">${esc(c.issuer)} · ${esc(c.date)}</div></div>`).join('')}` : ''}
         ${data.achievements.filter(a => a.trim()).length ? `<div class="sec">Achievements</div><ul>${data.achievements.filter(a => a.trim()).map(a => `<li>${esc(a)}</li>`).join('')}</ul>` : ''}
       </div>

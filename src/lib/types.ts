@@ -29,7 +29,8 @@ export interface ResumeExperience {
 
 export interface ResumeEducation {
     id: number;
-    school: string;
+    college: string;
+    university?: string;
     degree: string;
     date: string;
     gpa: string;
@@ -40,8 +41,9 @@ export interface ResumeProject {
     id: number;
     name: string;
     description: string;
-    tech: string;
-    link?: string;
+    tech: string[];
+    liveUrl?: string;
+    githubUrl?: string;
     date?: string;
 }
 
@@ -55,11 +57,11 @@ export interface ResumeCertification {
 export type ResumeTemplate = 'classic' | 'modern' | 'minimal';
 
 export interface SkillCategories {
-    languages?: string;
-    frameworks?: string;
-    cloudDevops?: string;
-    databases?: string;
-    tools?: string;
+    languages?: string[];
+    frameworks?: string[];
+    cloudDevops?: string[];
+    databases?: string[];
+    tools?: string[];
 }
 
 export interface ResumeData {

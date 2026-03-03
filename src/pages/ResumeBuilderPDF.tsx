@@ -95,12 +95,12 @@ export function ClassicResumePDF({ data }: { data: ResumeData }) {
                 )}
 
                 {/* Education */}
-                {data.education.filter(e => e.school).length > 0 && (
+                {data.education.filter(e => e.college).length > 0 && (
                     <View>
                         <Text style={s.sectionTitle}>Education</Text>
-                        {data.education.filter(e => e.school).map(edu => (
+                        {data.education.filter(e => e.college).map(edu => (
                             <View key={edu.id} style={{ marginBottom: 4 }}>
-                                <View style={s.expHeader}><Text style={s.bold}>{edu.school}</Text><Text style={s.muted}>{edu.date}</Text></View>
+                                <View style={s.expHeader}><Text style={s.bold}>{edu.college}{edu.university ? `, ${edu.university}` : ''}</Text><Text style={s.muted}>{edu.date}</Text></View>
                                 <View style={[s.expHeader, { marginTop: 0 }]}><Text style={s.italic}>{edu.degree}</Text>{edu.gpa ? <Text style={{ fontSize: 9 }}>CGPA: {edu.gpa}</Text> : null}</View>
                                 {edu.coursework ? <Text style={{ fontSize: 8.5, color: '#555' }}>Coursework: {edu.coursework}</Text> : null}
                             </View>
@@ -115,11 +115,15 @@ export function ClassicResumePDF({ data }: { data: ResumeData }) {
                         {data.projects.filter(p => p.name).map(proj => (
                             <View key={proj.id} style={{ marginBottom: 4 }}>
                                 <View style={s.expHeader}>
-                                    <Text style={s.bold}>{proj.name}{proj.link ? '  ' : ''}{proj.link ? <Link src={ensureHttps(proj.link)} style={[s.link, { fontSize: 8 }]}>{proj.link}</Link> : ''}</Text>
+                                    <Text style={s.bold}>
+                                        {proj.name}
+                                        {proj.liveUrl ? '  ' : ''}{proj.liveUrl ? <Link src={ensureHttps(proj.liveUrl)} style={[s.link, { fontSize: 8 }]}>Live</Link> : ''}
+                                        {proj.githubUrl ? '  ' : ''}{proj.githubUrl ? <Link src={ensureHttps(proj.githubUrl)} style={[s.link, { fontSize: 8 }]}>GitHub</Link> : ''}
+                                    </Text>
                                     <Text style={s.muted}>{proj.date}</Text>
                                 </View>
                                 {proj.description ? <Text>{proj.description}</Text> : null}
-                                {proj.tech ? <Text style={{ fontSize: 8.5, color: '#555' }}>Tech: {proj.tech}</Text> : null}
+                                {proj.tech && proj.tech.length > 0 ? <Text style={{ fontSize: 8.5, color: '#555' }}>Tech: {proj.tech.join(', ')}</Text> : null}
                             </View>
                         ))}
                     </View>
@@ -149,12 +153,27 @@ export function ClassicResumePDF({ data }: { data: ResumeData }) {
                 )}
 
                 {/* Skills */}
-                {data.skills ? (
-                    <View>
-                        <Text style={s.sectionTitle}>Technical Skills</Text>
-                        <Text style={{ color: '#222' }}>{data.skills}</Text>
-                    </View>
-                ) : null}
+                {(() => {
+                    const sc = data.skillCategories;
+                    const hasCats = sc && ((sc.languages?.length ?? 0) + (sc.frameworks?.length ?? 0) + (sc.cloudDevops?.length ?? 0) + (sc.databases?.length ?? 0) + (sc.tools?.length ?? 0) > 0);
+                    if (hasCats) return (
+                        <View>
+                            <Text style={s.sectionTitle}>Technical Skills</Text>
+                            {sc.languages?.length ? <View style={{ flexDirection: 'row', marginBottom: 2 }}><Text style={{ fontFamily: 'Helvetica-Bold', width: 100 }}>Languages: </Text><Text style={{ flex: 1, color: '#222' }}>{sc.languages.join(', ')}</Text></View> : null}
+                            {sc.frameworks?.length ? <View style={{ flexDirection: 'row', marginBottom: 2 }}><Text style={{ fontFamily: 'Helvetica-Bold', width: 100 }}>Frameworks: </Text><Text style={{ flex: 1, color: '#222' }}>{sc.frameworks.join(', ')}</Text></View> : null}
+                            {sc.cloudDevops?.length ? <View style={{ flexDirection: 'row', marginBottom: 2 }}><Text style={{ fontFamily: 'Helvetica-Bold', width: 100 }}>Cloud & DevOps: </Text><Text style={{ flex: 1, color: '#222' }}>{sc.cloudDevops.join(', ')}</Text></View> : null}
+                            {sc.databases?.length ? <View style={{ flexDirection: 'row', marginBottom: 2 }}><Text style={{ fontFamily: 'Helvetica-Bold', width: 100 }}>Databases: </Text><Text style={{ flex: 1, color: '#222' }}>{sc.databases.join(', ')}</Text></View> : null}
+                            {sc.tools?.length ? <View style={{ flexDirection: 'row', marginBottom: 2 }}><Text style={{ fontFamily: 'Helvetica-Bold', width: 100 }}>Tools & Others: </Text><Text style={{ flex: 1, color: '#222' }}>{sc.tools.join(', ')}</Text></View> : null}
+                        </View>
+                    );
+                    if (data.skills) return (
+                        <View>
+                            <Text style={s.sectionTitle}>Technical Skills</Text>
+                            <Text style={{ color: '#222' }}>{data.skills}</Text>
+                        </View>
+                    );
+                    return null;
+                })()}
             </Page>
         </Document>
     );
@@ -164,20 +183,20 @@ export function ClassicResumePDF({ data }: { data: ResumeData }) {
 // ACADEMIC PDF
 // ─────────────────────────────────────────────────────────────────────────────
 const acaStyles = StyleSheet.create({
-    page: { fontFamily: 'Times-Roman', fontSize: 9.5, paddingHorizontal: 34, paddingVertical: 28, color: '#111', lineHeight: 1.45 },
-    name: { fontSize: 15, fontFamily: 'Times-Bold', textAlign: 'center', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 2 },
-    contactRow: { flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap', fontSize: 8.5, color: '#444', marginBottom: 1 },
+    page: { fontFamily: 'Times-Roman', fontSize: 10, paddingHorizontal: 46, paddingVertical: 40, color: '#111', lineHeight: 1.45 },
+    name: { fontSize: 17, fontFamily: 'Times-Bold', textAlign: 'center', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 },
+    contactRow: { flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap', fontSize: 9, color: '#333', marginBottom: 6 },
     divider: { borderBottomWidth: 1, borderBottomColor: '#000', marginVertical: 4 },
-    secTitle: { fontFamily: 'Times-Bold', fontSize: 10, marginTop: 6, marginBottom: 2 },
-    expHeader: { flexDirection: 'row', justifyContent: 'space-between' },
-    bold: { fontFamily: 'Times-Bold' },
-    italic: { fontFamily: 'Times-Italic', color: '#333', fontSize: 9 },
-    bullet: { flexDirection: 'row', marginBottom: 1.5 },
-    dot: { width: 10 },
-    muted: { color: '#444', fontSize: 8.5 },
-    link: { color: '#1a56db', textDecoration: 'none' },
-    skillRow: { flexDirection: 'row', marginBottom: 1.5 },
-    skillLabel: { fontFamily: 'Times-Bold', width: 90 },
+    secTitle: { fontFamily: 'Times-Bold', fontSize: 11, marginTop: 10, marginBottom: 4, borderBottomWidth: 0.8, borderBottomColor: '#333', paddingBottom: 1.5 },
+    expHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 2 },
+    bold: { fontFamily: 'Times-Bold', fontSize: 10 },
+    italic: { fontFamily: 'Times-Italic', color: '#444', fontSize: 9.5, marginBottom: 2 },
+    bullet: { flexDirection: 'row', marginBottom: 2, paddingLeft: 12 },
+    dot: { width: 12, fontSize: 10, position: 'absolute', left: 0 },
+    muted: { color: '#555', fontSize: 9 },
+    link: { color: '#111', textDecoration: 'none' },
+    skillRow: { flexDirection: 'row', marginBottom: 2 },
+    skillLabel: { fontFamily: 'Times-Bold', width: 105 },
 });
 
 function AcaSection({ title, children }: { title: string; children: React.ReactNode }) {
@@ -198,14 +217,20 @@ export function AcademicResumePDF({ data }: { data: ResumeData }) {
         data.personal.portfolio ? { label: 'Portfolio', url: data.personal.portfolio } : null,
     ].filter(Boolean) as { label: string; url: string }[];
 
+    // Render contacts then links, dropping a | between them only if necessary
+    const hasContacts = contacts.length > 0;
+    const hasLinks = links.length > 0;
+
     return (
         <Document>
             <Page size="A4" style={acaStyles.page}>
-                <Text style={acaStyles.name}>{data.personal.name}</Text>
+                <Text style={acaStyles.name}>{data.personal.name || 'YOUR NAME'}</Text>
+
                 <View style={acaStyles.contactRow}>
-                    {contacts.map((c, i) => <Text key={i}>{c}{i < contacts.length - 1 ? '  |  ' : ''}</Text>)}
+                    {contacts.map((c, i) => <Text key={`c${i}`}>{c}{i < contacts.length - 1 ? '  |  ' : ''}</Text>)}
+                    {hasContacts && hasLinks ? <Text>  |  </Text> : null}
                     {links.map((l, i) => (
-                        <Text key={`l${i}`}>  |  <Link src={ensureHttps(l.url)} style={acaStyles.link}>{l.label}</Link></Text>
+                        <Text key={`l${i}`}><Link src={ensureHttps(l.url)} style={acaStyles.link}>{l.label}</Link>{i < links.length - 1 ? '  |  ' : ''}</Text>
                     ))}
                 </View>
                 <View style={acaStyles.divider} />
@@ -218,16 +243,19 @@ export function AcademicResumePDF({ data }: { data: ResumeData }) {
                 ) : null}
 
                 {/* Technical Skills — categorized */}
-                {(sc?.languages || sc?.frameworks || sc?.cloudDevops || sc?.databases || sc?.tools || data.skills) && (
+                {(sc?.languages?.length || sc?.frameworks?.length || sc?.cloudDevops?.length || sc?.databases?.length || sc?.tools?.length) ? (
                     <AcaSection title="Technical Skills">
-                        {sc?.languages && <View style={acaStyles.skillRow}><Text style={acaStyles.skillLabel}>Languages: </Text><Text style={{ flex: 1 }}>{sc.languages}</Text></View>}
-                        {sc?.frameworks && <View style={acaStyles.skillRow}><Text style={acaStyles.skillLabel}>Frameworks: </Text><Text style={{ flex: 1 }}>{sc.frameworks}</Text></View>}
-                        {sc?.cloudDevops && <View style={acaStyles.skillRow}><Text style={acaStyles.skillLabel}>Cloud &amp; DevOps: </Text><Text style={{ flex: 1 }}>{sc.cloudDevops}</Text></View>}
-                        {sc?.databases && <View style={acaStyles.skillRow}><Text style={acaStyles.skillLabel}>Databases: </Text><Text style={{ flex: 1 }}>{sc.databases}</Text></View>}
-                        {sc?.tools && <View style={acaStyles.skillRow}><Text style={acaStyles.skillLabel}>Tools &amp; Others: </Text><Text style={{ flex: 1 }}>{sc.tools}</Text></View>}
-                        {!sc && data.skills ? <Text>{data.skills}</Text> : null}
+                        {sc?.languages?.length ? <View style={acaStyles.skillRow}><Text style={acaStyles.skillLabel}>Languages: </Text><Text style={{ flex: 1 }}>{sc.languages.join(', ')}</Text></View> : null}
+                        {sc?.frameworks?.length ? <View style={acaStyles.skillRow}><Text style={acaStyles.skillLabel}>Frameworks: </Text><Text style={{ flex: 1 }}>{sc.frameworks.join(', ')}</Text></View> : null}
+                        {sc?.cloudDevops?.length ? <View style={acaStyles.skillRow}><Text style={acaStyles.skillLabel}>Cloud &amp; DevOps: </Text><Text style={{ flex: 1 }}>{sc.cloudDevops.join(', ')}</Text></View> : null}
+                        {sc?.databases?.length ? <View style={acaStyles.skillRow}><Text style={acaStyles.skillLabel}>Databases: </Text><Text style={{ flex: 1 }}>{sc.databases.join(', ')}</Text></View> : null}
+                        {sc?.tools?.length ? <View style={acaStyles.skillRow}><Text style={acaStyles.skillLabel}>Tools &amp; Others: </Text><Text style={{ flex: 1 }}>{sc.tools.join(', ')}</Text></View> : null}
                     </AcaSection>
-                )}
+                ) : data.skills ? (
+                    <AcaSection title="Technical Skills">
+                        <Text>{data.skills}</Text>
+                    </AcaSection>
+                ) : null}
 
                 {/* Experience */}
                 {data.experience.filter(e => e.company).length > 0 && (
@@ -254,26 +282,30 @@ export function AcademicResumePDF({ data }: { data: ResumeData }) {
                         {data.projects.filter(p => p.name).map(proj => (
                             <View key={proj.id} style={{ marginBottom: 4 }}>
                                 <View style={acaStyles.expHeader}>
-                                    <Text style={acaStyles.bold}>{proj.name}</Text>
+                                    <Text style={acaStyles.bold}>
+                                        {proj.name}
+                                        {proj.liveUrl ? '  ' : ''}{proj.liveUrl ? <Link src={ensureHttps(proj.liveUrl)} style={[acaStyles.link, { fontSize: 8.5 }]}>Live</Link> : ''}
+                                        {proj.githubUrl ? '  ' : ''}{proj.githubUrl ? <Link src={ensureHttps(proj.githubUrl)} style={[acaStyles.link, { fontSize: 8.5 }]}>GitHub</Link> : ''}
+                                    </Text>
                                     <Text style={acaStyles.muted}>{proj.date}</Text>
                                 </View>
                                 {proj.description ? <Text>{proj.description}</Text> : null}
-                                {proj.tech ? <Text style={{ fontSize: 8.5, color: '#555' }}>Tech: {proj.tech}</Text> : null}
+                                {proj.tech && proj.tech.length > 0 ? <Text style={{ fontSize: 8.5, color: '#555' }}>Tech: {proj.tech.join(', ')}</Text> : null}
                             </View>
                         ))}
                     </AcaSection>
                 )}
 
                 {/* Education */}
-                {data.education.filter(e => e.school).length > 0 && (
+                {data.education.filter(e => e.college).length > 0 && (
                     <AcaSection title="Education">
-                        {data.education.filter(e => e.school).map(edu => (
+                        {data.education.filter(e => e.college).map(edu => (
                             <View key={edu.id} style={{ marginBottom: 4 }}>
                                 <View style={acaStyles.expHeader}>
                                     <Text style={acaStyles.bold}>{edu.degree}</Text>
                                     <Text style={acaStyles.muted}>{edu.date}</Text>
                                 </View>
-                                <Text style={acaStyles.italic}>{edu.school}{edu.gpa ? `  CGPA: ${edu.gpa}` : ''}</Text>
+                                <Text style={acaStyles.italic}>{edu.college}{edu.university ? `, ${edu.university}` : ''}{edu.gpa ? `  CGPA: ${edu.gpa}` : ''}</Text>
                                 {edu.coursework ? <Text style={{ fontSize: 8.5, color: '#444' }}>Relevant Coursework: {edu.coursework}</Text> : null}
                             </View>
                         ))}
@@ -310,7 +342,7 @@ export function AcademicResumePDF({ data }: { data: ResumeData }) {
 // ─────────────────────────────────────────────────────────────────────────────
 const modStyles = StyleSheet.create({
     page: { fontFamily: 'Helvetica', fontSize: 8.5, paddingHorizontal: 30, paddingVertical: 26, color: '#111', lineHeight: 1.4 },
-    header: { borderBottomWidth: 2, borderBottomColor: '#000', paddingBottom: 5, marginBottom: 5 },
+    header: { borderBottomWidth: 2, borderBottomColor: '#000', paddingBottom: 8, marginBottom: 10 },
     name: { fontSize: 20, fontFamily: 'Helvetica-Bold', letterSpacing: -0.3, marginBottom: 2 },
     role: { fontSize: 9, color: '#333', fontFamily: 'Helvetica-Bold', marginBottom: 2 },
     linksRow: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
@@ -375,9 +407,12 @@ export function ModernResumePDF({ data }: { data: ResumeData }) {
                                             <Text style={modStyles.bold}>{proj.name}</Text>
                                             <Text style={{ fontSize: 7.5, color: '#666' }}>{proj.date}</Text>
                                         </View>
-                                        {proj.link ? <Link src={ensureHttps(proj.link)} style={modStyles.link}>{proj.link}</Link> : null}
+                                        <View style={{ flexDirection: 'row', gap: 6, marginBottom: 1 }}>
+                                            {proj.liveUrl ? <Link src={ensureHttps(proj.liveUrl)} style={modStyles.link}>Live</Link> : null}
+                                            {proj.githubUrl ? <Link src={ensureHttps(proj.githubUrl)} style={modStyles.link}>GitHub</Link> : null}
+                                        </View>
                                         {proj.description ? <Text style={{ fontSize: 8 }}>{proj.description}</Text> : null}
-                                        {proj.tech ? <Text style={{ fontSize: 7.5, color: '#555' }}>Tech: {proj.tech}</Text> : null}
+                                        {proj.tech && proj.tech.length > 0 ? <Text style={{ fontSize: 7.5, color: '#555' }}>Tech: {proj.tech.join(', ')}</Text> : null}
                                     </View>
                                 ))}
                             </View>
@@ -386,18 +421,33 @@ export function ModernResumePDF({ data }: { data: ResumeData }) {
 
                     {/* Right */}
                     <View style={modStyles.right}>
-                        {data.skills ? (
-                            <View>
-                                <Text style={[modStyles.secTitle, { marginTop: 0 }]}>Skills</Text>
-                                <Text style={{ fontSize: 8, color: '#333' }}>{data.skills}</Text>
-                            </View>
-                        ) : null}
-                        {data.education.filter(e => e.school).length > 0 && (
+                        {(() => {
+                            const sc = data.skillCategories;
+                            const hasCats = sc && ((sc.languages?.length ?? 0) + (sc.frameworks?.length ?? 0) + (sc.cloudDevops?.length ?? 0) + (sc.databases?.length ?? 0) + (sc.tools?.length ?? 0) > 0);
+                            if (hasCats) return (
+                                <View>
+                                    <Text style={[modStyles.secTitle, { marginTop: 0 }]}>Skills</Text>
+                                    {sc.languages?.length ? <View style={{ flexDirection: 'row', marginBottom: 1.5 }}><Text style={{ fontFamily: 'Helvetica-Bold', fontSize: 7.5 }}>Languages: </Text><Text style={{ flex: 1, fontSize: 8, color: '#333' }}>{sc.languages.join(', ')}</Text></View> : null}
+                                    {sc.frameworks?.length ? <View style={{ flexDirection: 'row', marginBottom: 1.5 }}><Text style={{ fontFamily: 'Helvetica-Bold', fontSize: 7.5 }}>Frameworks: </Text><Text style={{ flex: 1, fontSize: 8, color: '#333' }}>{sc.frameworks.join(', ')}</Text></View> : null}
+                                    {sc.cloudDevops?.length ? <View style={{ flexDirection: 'row', marginBottom: 1.5 }}><Text style={{ fontFamily: 'Helvetica-Bold', fontSize: 7.5 }}>Cloud & DevOps: </Text><Text style={{ flex: 1, fontSize: 8, color: '#333' }}>{sc.cloudDevops.join(', ')}</Text></View> : null}
+                                    {sc.databases?.length ? <View style={{ flexDirection: 'row', marginBottom: 1.5 }}><Text style={{ fontFamily: 'Helvetica-Bold', fontSize: 7.5 }}>Databases: </Text><Text style={{ flex: 1, fontSize: 8, color: '#333' }}>{sc.databases.join(', ')}</Text></View> : null}
+                                    {sc.tools?.length ? <View style={{ flexDirection: 'row', marginBottom: 1.5 }}><Text style={{ fontFamily: 'Helvetica-Bold', fontSize: 7.5 }}>Tools & Others: </Text><Text style={{ flex: 1, fontSize: 8, color: '#333' }}>{sc.tools.join(', ')}</Text></View> : null}
+                                </View>
+                            );
+                            if (data.skills) return (
+                                <View>
+                                    <Text style={[modStyles.secTitle, { marginTop: 0 }]}>Skills</Text>
+                                    <Text style={{ fontSize: 8, color: '#333' }}>{data.skills}</Text>
+                                </View>
+                            );
+                            return null;
+                        })()}
+                        {data.education.filter(e => e.college).length > 0 && (
                             <View>
                                 <Text style={modStyles.secTitle}>Education</Text>
-                                {data.education.filter(e => e.school).map(edu => (
+                                {data.education.filter(e => e.college).map(edu => (
                                     <View key={edu.id} style={{ marginBottom: 4 }}>
-                                        <Text style={modStyles.bold}>{edu.school}</Text>
+                                        <Text style={modStyles.bold}>{edu.college}{edu.university ? `, ${edu.university}` : ''}</Text>
                                         <Text style={modStyles.italic}>{edu.degree}</Text>
                                         <Text style={{ fontSize: 7.5, color: '#555' }}>{edu.date}{edu.gpa ? `  ·  CGPA: ${edu.gpa}` : ''}</Text>
                                     </View>
