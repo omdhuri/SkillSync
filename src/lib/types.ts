@@ -9,6 +9,7 @@ export interface UserProfile {
     phone: string;
     location: string;
     linkedin: string;
+    github?: string;
     portfolio: string;
     bio: string;
     avatar: string;
@@ -23,6 +24,7 @@ export interface ResumeExperience {
     role: string;
     date: string;
     bullets: string[];
+    technologiesUsed?: string;
 }
 
 export interface ResumeEducation {
@@ -31,6 +33,33 @@ export interface ResumeEducation {
     degree: string;
     date: string;
     gpa: string;
+    coursework?: string;
+}
+
+export interface ResumeProject {
+    id: number;
+    name: string;
+    description: string;
+    tech: string;
+    link?: string;
+    date?: string;
+}
+
+export interface ResumeCertification {
+    id: number;
+    name: string;
+    issuer: string;
+    date: string;
+}
+
+export type ResumeTemplate = 'classic' | 'modern' | 'minimal';
+
+export interface SkillCategories {
+    languages?: string;
+    frameworks?: string;
+    cloudDevops?: string;
+    databases?: string;
+    tools?: string;
 }
 
 export interface ResumeData {
@@ -40,10 +69,16 @@ export interface ResumeData {
         phone: string;
         location: string;
         linkedin: string;
+        github?: string;
         portfolio: string;
     };
+    summary: string;
+    skillCategories?: SkillCategories;
     experience: ResumeExperience[];
     education: ResumeEducation[];
+    projects: ResumeProject[];
+    certifications: ResumeCertification[];
+    achievements: string[];
     skills: string;
 }
 

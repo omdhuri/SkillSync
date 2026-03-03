@@ -241,3 +241,45 @@ Return a JSON object with a "jobs" array. Sort by matchScore descending.`
     );
     return result.jobs;
 }
+
+/**
+ * RESUME BUILDER — Generate a professional summary from role, skills, and experience.
+ */
+export async function generateProfessionalSummary(
+    targetRole: string,
+    skills: string[],
+    yearsOfExperience: string
+): Promise<string> {
+    return ask(
+        `Write a concise, powerful 2-3 sentence professional summary for a resume.
+Target Role: ${targetRole}
+Years of Experience: ${yearsOfExperience}
+Top Skills: ${skills.slice(0, 8).join(', ')}
+
+Requirements:
+- Start with a strong opening (e.g. "Results-driven", "Passionate", "Innovative")
+- Mention the target role and years of experience
+- Highlight 2-3 key skills or achievements
+- End with a value proposition (what they bring to the employer)
+- Keep it under 60 words, no clichés, ATS-friendly
+- Return ONLY the summary text, no quotes or labels`
+    );
+}
+
+/**
+ * RESUME BUILDER — Rewrite a single bullet point for maximum impact.
+ */
+export async function rewriteSingleBullet(bullet: string): Promise<string> {
+    return ask(
+        `Rewrite this resume bullet point to be more impactful and ATS-optimized.
+
+Original: "${bullet}"
+
+Rules:
+- Start with a strong action verb (Engineered, Spearheaded, Architected, Optimized, etc.)
+- Add quantified metrics if not present (estimate reasonable numbers)
+- Keep it to 1 line max
+- Do NOT add quotes or explanations
+- Return ONLY the rewritten bullet`
+    );
+}
