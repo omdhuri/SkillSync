@@ -28,66 +28,74 @@ export function TestResults({ result, onRetake, onReconfigure }: TestResultsProp
     const grade = getGrade(result.accuracy);
 
     return (
-        <div className="max-w-3xl mx-auto space-y-6">
+        <div className="max-w-3xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* Hero Score Card */}
-            <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                <div className="bg-gradient-to-br from-indigo-600 to-indigo-700 px-8 py-10 text-white text-center">
-                    <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Trophy className="w-8 h-8 text-white" />
-                    </div>
-                    <h1 className="text-3xl font-bold mb-1">Assessment Complete!</h1>
-                    <p className={`text-indigo-200 text-sm font-medium ${grade.color.replace('text-', 'text-')}`}>
-                        Grade: <span className="text-white font-bold">{grade.label}</span>
-                    </p>
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-lg shadow-slate-200/50 overflow-hidden relative">
+                {/* Decorative background elements */}
+                <div className="absolute top-0 right-0 p-12 opacity-10 pointer-events-none">
+                    <Trophy className="w-48 h-48 text-white transform rotate-12" />
                 </div>
 
-                <div className="grid grid-cols-3 divide-x divide-slate-100 text-center py-6 px-4">
-                    <div className="px-4">
-                        <div className="flex items-center justify-center gap-1 mb-1">
+                <div className="bg-gradient-to-br from-indigo-600 via-indigo-700 to-violet-800 px-8 py-12 text-white text-center relative overflow-hidden">
+                    <div className="animate-in zoom-in duration-700 delay-150 relative z-10">
+                        <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-5 shadow-inner">
+                            <Trophy className="w-10 h-10 text-white drop-shadow-md" />
+                        </div>
+                        <h1 className="text-4xl font-extrabold mb-2 tracking-tight">Assessment Complete!</h1>
+                        <p className={`text-indigo-100 text-sm font-medium inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md`}>
+                            Grade: <span className="text-white font-bold">{grade.label}</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-3 divide-x divide-slate-100 text-center py-8 px-4 bg-white relative z-10">
+                    <div className="px-4 animate-in slide-in-from-bottom-2 duration-500 delay-300">
+                        <div className="flex items-center justify-center gap-1.5 mb-2">
                             <Target className="w-4 h-4 text-indigo-500" />
-                            <span className="text-xs text-slate-500 font-medium">Score</span>
+                            <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Score</span>
                         </div>
-                        <div className="text-2xl font-bold text-slate-900">
-                            {result.score}<span className="text-slate-400 text-lg">/{result.total}</span>
+                        <div className="text-3xl font-extrabold text-slate-900">
+                            {result.score}<span className="text-slate-400 text-xl font-medium">/{result.total}</span>
                         </div>
                     </div>
-                    <div className="px-4">
-                        <div className="flex items-center justify-center gap-1 mb-1">
+                    <div className="px-4 animate-in slide-in-from-bottom-2 duration-500 delay-400">
+                        <div className="flex items-center justify-center gap-1.5 mb-2">
                             <TrendingUp className="w-4 h-4 text-emerald-500" />
-                            <span className="text-xs text-slate-500 font-medium">Accuracy</span>
+                            <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Accuracy</span>
                         </div>
-                        <div className={`text-2xl font-bold ${grade.color}`}>{result.accuracy}%</div>
+                        <div className={`text-3xl font-extrabold ${grade.color}`}>{result.accuracy}%</div>
                     </div>
-                    <div className="px-4">
-                        <div className="flex items-center justify-center gap-1 mb-1">
+                    <div className="px-4 animate-in slide-in-from-bottom-2 duration-500 delay-500">
+                        <div className="flex items-center justify-center gap-1.5 mb-2">
                             <Clock className="w-4 h-4 text-amber-500" />
-                            <span className="text-xs text-slate-500 font-medium">Time</span>
+                            <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Time</span>
                         </div>
-                        <div className="text-2xl font-bold text-slate-900">{formatTime(result.timeTakenSeconds)}</div>
+                        <div className="text-3xl font-extrabold text-slate-900">{formatTime(result.timeTakenSeconds)}</div>
                     </div>
                 </div>
             </div>
 
             {/* Category Breakdown Chart */}
             {result.categoryBreakdown.length > 0 && (
-                <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
-                    <h2 className="text-sm font-semibold text-slate-700 uppercase tracking-wide mb-6">
+                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 animate-in slide-in-from-bottom-2 duration-500 delay-500 fill-mode-both">
+                    <h2 className="text-sm font-bold text-slate-700 uppercase tracking-widest mb-6">
                         Performance by Category
                     </h2>
                     <ResponsiveContainer width="100%" height={220}>
                         <BarChart data={result.categoryBreakdown} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
                             <XAxis
                                 dataKey="category"
-                                tick={{ fontSize: 11, fill: '#64748b' }}
+                                tick={{ fontSize: 11, fill: '#64748b', fontWeight: 600 }}
                                 tickLine={false}
                                 axisLine={false}
                             />
                             <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} tickLine={false} axisLine={false} />
                             <Tooltip
                                 formatter={(value, name) => [value, name === 'correct' ? 'Correct' : 'Total']}
-                                contentStyle={{ borderRadius: 8, border: '1px solid #e2e8f0', fontSize: 12 }}
+                                contentStyle={{ borderRadius: 12, border: '1px solid #e2e8f0', fontSize: 12, boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                cursor={{ fill: '#f8fafc' }}
                             />
-                            <Bar dataKey="correct" radius={[4, 4, 0, 0]} maxBarSize={48}>
+                            <Bar dataKey="correct" radius={[6, 6, 0, 0]} maxBarSize={48}>
                                 {result.categoryBreakdown.map((entry, idx) => {
                                     const pct = entry.total > 0 ? entry.correct / entry.total : 0;
                                     const color = pct >= 0.75 ? '#10b981' : pct >= 0.5 ? '#f59e0b' : '#f43f5e';
@@ -96,7 +104,7 @@ export function TestResults({ result, onRetake, onReconfigure }: TestResultsProp
                             </Bar>
                         </BarChart>
                     </ResponsiveContainer>
-                    <div className="flex items-center justify-center gap-6 mt-2">
+                    <div className="flex items-center justify-center gap-6 mt-4">
                         <Legend color="bg-emerald-500" label="≥ 75%" />
                         <Legend color="bg-amber-400" label="50–74%" />
                         <Legend color="bg-rose-500" label="< 50%" />
@@ -138,28 +146,29 @@ export function TestResults({ result, onRetake, onReconfigure }: TestResultsProp
                         return (
                             <div
                                 key={q.id}
-                                className={`rounded-xl border ${isCorrect ? 'border-emerald-200 bg-emerald-50/40' : 'border-rose-200 bg-rose-50/40'
-                                    }`}
+                                className={`rounded-xl border transition-all duration-300 ${isCorrect
+                                    ? 'border-emerald-200 bg-emerald-50/40'
+                                    : 'border-rose-200 bg-rose-50/40'} ${isExpanded ? 'shadow-md' : 'hover:shadow-sm'}`}
                             >
                                 <button
                                     onClick={() => setExpandedIdx(isExpanded ? null : idx)}
-                                    className="w-full flex items-center justify-between px-5 py-3.5 text-left"
+                                    className="w-full flex items-center justify-between px-5 py-4 text-left focus:outline-none"
                                 >
                                     <div className="flex items-center gap-3">
                                         {isCorrect ? (
-                                            <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                                            <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0" />
                                         ) : (
-                                            <XCircle className="w-4 h-4 text-rose-500 flex-shrink-0" />
+                                            <XCircle className="w-5 h-5 text-rose-500 flex-shrink-0" />
                                         )}
-                                        <span className="text-sm font-medium text-slate-700 line-clamp-1">
+                                        <span className="text-sm font-semibold text-slate-700 line-clamp-1">
                                             <span className="text-slate-400 mr-2">Q{idx + 1}.</span>
                                             {q.text.length > 80 ? q.text.slice(0, 80) + '…' : q.text}
                                         </span>
                                     </div>
                                     {isExpanded ? (
-                                        <ChevronUp className="w-4 h-4 text-slate-400 flex-shrink-0" />
+                                        <ChevronUp className="w-5 h-5 text-slate-400 flex-shrink-0 transition-transform duration-200" />
                                     ) : (
-                                        <ChevronDown className="w-4 h-4 text-slate-400 flex-shrink-0" />
+                                        <ChevronDown className="w-5 h-5 text-slate-400 flex-shrink-0 transition-transform duration-200" />
                                     )}
                                 </button>
 
@@ -174,10 +183,10 @@ export function TestResults({ result, onRetake, onReconfigure }: TestResultsProp
                                                     <div
                                                         key={oIdx}
                                                         className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm ${isCorrectOption
-                                                                ? 'bg-emerald-100 text-emerald-800 font-medium'
-                                                                : isSelected && !isCorrect
-                                                                    ? 'bg-rose-100 text-rose-800'
-                                                                    : 'text-slate-600'
+                                                            ? 'bg-emerald-100 text-emerald-800 font-medium'
+                                                            : isSelected && !isCorrect
+                                                                ? 'bg-rose-100 text-rose-800'
+                                                                : 'text-slate-600'
                                                             }`}
                                                     >
                                                         <span className="font-bold text-xs w-5 flex-shrink-0">
@@ -205,19 +214,19 @@ export function TestResults({ result, onRetake, onReconfigure }: TestResultsProp
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-3 pb-8">
+            <div className="flex gap-4 pb-8 animate-in slide-in-from-bottom-2 duration-500 delay-1000 fill-mode-both">
                 <button
                     onClick={onReconfigure}
-                    className="flex items-center gap-2 px-5 py-3 rounded-xl border-2 border-slate-200 text-slate-700 text-sm font-semibold hover:border-slate-300 hover:bg-slate-50 transition-colors"
+                    className="flex items-center gap-2 px-6 py-4 rounded-xl border-2 border-slate-200 text-slate-700 text-sm font-bold tracking-wide hover:border-slate-300 hover:bg-slate-50 transition-all hover:-translate-y-0.5"
                 >
-                    <Settings2 className="w-4 h-4" />
+                    <Settings2 className="w-5 h-5" />
                     Change Config
                 </button>
                 <button
                     onClick={onRetake}
-                    className="flex-1 flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition-colors shadow-md shadow-indigo-200"
+                    className="flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white text-sm font-bold tracking-wide transition-all hover:shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-0.5 active:scale-95"
                 >
-                    <RotateCcw className="w-4 h-4" />
+                    <RotateCcw className="w-5 h-5" />
                     Retake Test
                 </button>
             </div>

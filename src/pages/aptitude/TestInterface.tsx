@@ -1,5 +1,5 @@
-import { useState, useCallback } from 'react';
-import { Clock, ChevronLeft, ChevronRight, CheckCircle2, Flag, Send } from 'lucide-react';
+import { useState, useCallback, useEffect } from 'react';
+import { Clock, ChevronLeft, ChevronRight, CheckCircle2, Flag, Send, AlertCircle, X } from 'lucide-react';
 import type { Question, UserAnswer, PlatformSource } from '../../types/aptitude';
 import { useTimer } from '../../hooks/useTimer';
 
@@ -16,6 +16,17 @@ export function TestInterface({ questions, totalSeconds, onSubmit }: TestInterfa
     const [answers, setAnswers] = useState<(number | null)[]>(new Array(questions.length).fill(null));
     const [flagged, setFlagged] = useState<Set<number>>(new Set());
     const [startTime] = useState(Date.now());
+    const [showSubmitModal, setShowSubmitModal] = useState(false);
+
+    // Prevent accidental navigation
+    useEffect(() => {
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            e.preventDefault();
+            e.returnValue = ''; // Standard way to show browser's leave prompt
+        };
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+    }, []);
 
     const submitAnswers = useCallback(() => {
         const timeTaken = Math.round((Date.now() - startTime) / 1000);
@@ -39,6 +50,13 @@ export function TestInterface({ questions, totalSeconds, onSubmit }: TestInterfa
             next[currentIndex] = idx;
             return next;
         });
+
+        // Auto-advance after small delay if not the last question and option changed
+        if (currentIndex < questions.length - 1 && answers[currentIndex] !== idx) {
+            setTimeout(() => {
+                setCurrentIndex(i => Math.min(questions.length - 1, i + 1));
+            }, 500);
+        }
     };
 
     const toggleFlag = () => {
@@ -169,8 +187,8 @@ export function TestInterface({ questions, totalSeconds, onSubmit }: TestInterfa
 
                     {currentIndex === questions.length - 1 ? (
                         <button
-                            onClick={submitAnswers}
-                            className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition-colors shadow-sm"
+                            onClick={() => setShowSubmitModal(true)}
+                            className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition-all hover:scale-105 active:scale-95 shadow-sm hover:shadow-indigo-500/25"
                         >
                             <Send className="w-4 h-4" />
                             Submit Test
@@ -178,7 +196,7 @@ export function TestInterface({ questions, totalSeconds, onSubmit }: TestInterfa
                     ) : (
                         <button
                             onClick={() => setCurrentIndex((i) => Math.min(questions.length - 1, i + 1))}
-                            className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition-colors"
+                            className="flex items-center gap-1.5 px-6 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition-all hover:scale-105 active:scale-95 shadow-sm hover:shadow-indigo-500/25"
                         >
                             Next
                             <ChevronRight className="w-4 h-4" />
@@ -215,6 +233,63 @@ export function TestInterface({ questions, totalSeconds, onSubmit }: TestInterfa
                     <Legend color="bg-slate-100 border border-slate-200" label="Unanswered" />
                 </div>
             </div>
+
+            {/* Submit Confirmation Modal */}
+            {showSubmitModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
+                        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                            <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                <AlertCircle className="w-5 h-5 text-indigo-500" />
+                                Submit Assessment?
+                            </h3>
+                            <button
+                                onClick={() => setShowSubmitModal(false)}
+                                className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+                        <div className="p-6">
+                            <p className="text-slate-600 mb-6 font-medium">
+                                Are you sure you want to completely submit your test? You cannot return and change answers.
+                            </p>
+
+                            <div className="bg-slate-50 rounded-xl p-4 mb-6 border border-slate-100 grid grid-cols-2 gap-4">
+                                <div>
+                                    <p className="text-xs text-slate-500 uppercase tracking-wider font-semibold mb-1">Answered</p>
+                                    <p className="text-emerald-600 font-bold text-lg">{answeredCount} <span className="text-emerald-600/50 text-sm">/ {questions.length}</span></p>
+                                </div>
+                                <div>
+                                    <p className="text-xs text-slate-500 uppercase tracking-wider font-semibold mb-1">Unanswered</p>
+                                    <p className={`font-bold text-lg ${questions.length - answeredCount > 0 ? 'text-rose-500' : 'text-slate-400'}`}>
+                                        {questions.length - answeredCount}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => setShowSubmitModal(false)}
+                                    className="flex-1 px-4 py-3 rounded-xl border-2 border-slate-200 text-slate-700 font-semibold hover:border-slate-300 hover:bg-slate-50 transition-colors"
+                                >
+                                    Review Answers
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setShowSubmitModal(false);
+                                        submitAnswers();
+                                    }}
+                                    className="flex-1 px-4 py-3 rounded-xl bg-indigo-600 text-white font-semibold flex items-center justify-center gap-2 hover:bg-indigo-700 hover:shadow-md transition-all active:scale-95"
+                                >
+                                    <CheckCircle2 className="w-5 h-5" />
+                                    Submit
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
