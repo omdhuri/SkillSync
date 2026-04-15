@@ -3,7 +3,6 @@ import { Layout } from './components/Layout';
 import { Dashboard } from './pages/Dashboard';
 import { SkillGapAnalyzer } from './pages/SkillGapAnalyzer';
 import { Roadmap } from './pages/Roadmap';
-import { SalaryBenchmarking } from './pages/SalaryBenchmarking';
 import { JobSuggestions } from './pages/JobSuggestions';
 import { ResumeBuilder } from './pages/ResumeBuilder';
 import { AptitudeTest } from './pages/AptitudeTest';
@@ -24,7 +23,6 @@ export default function App() {
           <Route path="aptitude-test" element={<AptitudeTest />} />
           <Route path="mock-interview" element={<MockInterview />} />
           <Route path="job-suggestions" element={<JobSuggestions />} />
-          <Route path="salary-benchmarking" element={<SalaryBenchmarking />} />
           <Route path="skill-gap-analyzer" element={<SkillGapAnalyzer />} />
           <Route path="learning-paths" element={<LearningPaths />} />
           <Route path="ats-linter" element={<AtsLinter />} />

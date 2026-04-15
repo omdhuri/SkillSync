@@ -3,7 +3,7 @@
 // All AI-powered features call through these helpers
 // ================================================
 
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenAI } from '@google/genai/web';
 import type {
     AptitudeQuestion,
     AtsReport,
@@ -12,9 +12,26 @@ import type {
     SkillGapResult,
 } from './types';
 
-// Initialize the client with the key injected by Vite
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
+// Get API key from environment - require it to be set
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
+
+// Initialize the client - only if API key is available
+let ai: GoogleGenAI | null = null;
+if (API_KEY) {
+    ai = new GoogleGenAI(API_KEY);
+} else {
+    console.warn('⚠️ VITE_GEMINI_API_KEY not set - AI features will not work');
+}
+
 const MODEL = 'gemini-2.0-flash';
+
+// Helper to check if AI is available
+function ensureAI(): GoogleGenAI {
+    if (!ai) {
+        throw new Error('Gemini API key not configured. Please set VITE_GEMINI_API_KEY in your .env file.');
+    }
+    return ai;
+}
 
 // ---- Helpers ----
 
@@ -22,7 +39,8 @@ const MODEL = 'gemini-2.0-flash';
  * Send a prompt to Gemini and get the text response.
  */
 async function ask(prompt: string, systemInstruction?: string): Promise<string> {
-    const response = await ai.models.generateContent({
+    const client = ensureAI();
+    const response = await client.models.generateContent({
         model: MODEL,
         contents: prompt,
         config: systemInstruction ? { systemInstruction } : undefined,
@@ -34,7 +52,8 @@ async function ask(prompt: string, systemInstruction?: string): Promise<string> 
  * Send a prompt and parse the JSON response.
  */
 async function askJSON<T>(prompt: string, systemInstruction?: string): Promise<T> {
-    const response = await ai.models.generateContent({
+    const client = ensureAI();
+    const response = await client.models.generateContent({
         model: MODEL,
         contents: prompt,
         config: {

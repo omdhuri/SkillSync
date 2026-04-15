@@ -5,7 +5,6 @@ import {
   BrainCircuit, 
   Mic, 
   Briefcase, 
-  CircleDollarSign, 
   Search, 
   GraduationCap, 
   CheckSquare,
@@ -54,14 +53,6 @@ const modules = [
     icon: Briefcase,
     color: 'bg-rose-500',
     lightColor: 'bg-rose-50 text-rose-600',
-  },
-  {
-    name: 'Salary Comparison',
-    description: 'Compare salaries by role and city.',
-    href: '/salary-benchmarking',
-    icon: CircleDollarSign,
-    color: 'bg-teal-500',
-    lightColor: 'bg-teal-50 text-teal-600',
   },
   {
     name: 'Skill Gap',

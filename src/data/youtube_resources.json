@@ -1,0 +1,611 @@
+[
+  {
+    "skill": "Frontend",
+    "resources": [
+      {
+        "title": "HTML & CSS Full Course for Beginners \u2013 Dave Gray",
+        "url": "https://www.youtube.com/watch?v=mU6anWqZJcc"
+      },
+      {
+        "title": "JavaScript Crash Course \u2013 Traversy Media",
+        "url": "https://www.youtube.com/watch?v=hdI2bqOjy3c"
+      },
+      {
+        "title": "React JS Full Course for Beginners \u2013 Dave Gray",
+        "url": "https://www.youtube.com/watch?v=RVFAyFWO4go"
+      },
+      {
+        "title": "HTML & CSS Full Course Hindi \u2013 Apna College",
+        "url": "https://www.youtube.com/watch?v=HcOc7197tpo"
+      },
+      {
+        "title": "JavaScript Full Course Hindi \u2013 Apna College",
+        "url": "https://www.youtube.com/watch?v=ajdRvxDWH4w"
+      },
+      {
+        "title": "React JS Course Hindi \u2013 Thapa Technical",
+        "url": "https://www.youtube.com/watch?v=RGKi6LSPDLU"
+      }
+    ]
+  },
+  {
+    "skill": "Backend",
+    "resources": [
+      {
+        "title": "Node.js & Express Crash Course \u2013 Traversy Media",
+        "url": "https://www.youtube.com/watch?v=fBNz5xF-Kx4"
+      },
+      {
+        "title": "Backend Web Dev (Node, Express, MongoDB) \u2013 freeCodeCamp",
+        "url": "https://www.youtube.com/watch?v=Oe421EPjeBE"
+      },
+      {
+        "title": "Python Backend Web Development \u2013 freeCodeCamp",
+        "url": "https://www.youtube.com/watch?v=0sOvCWFmrtA"
+      },
+      {
+        "title": "Node.js Full Course Hindi \u2013 Thapa Technical",
+        "url": "https://www.youtube.com/watch?v=BLl32FvcdVM"
+      },
+      {
+        "title": "Backend Development Hindi \u2013 CodeWithHarry",
+        "url": "https://www.youtube.com/watch?v=ooBxSMhjmko"
+      },
+      {
+        "title": "Express.js Crash Course Hindi \u2013 Apna College",
+        "url": "https://www.youtube.com/watch?v=7H_QH9nipNs"
+      }
+    ]
+  },
+  {
+    "skill": "Full Stack",
+    "resources": [
+      {
+        "title": "Full Stack Web Dev for Beginners (48hr) \u2013 freeCodeCamp",
+        "url": "https://www.youtube.com/watch?v=nu_pCVPKzTk"
+      },
+      {
+        "title": "MERN Stack Full Tutorial \u2013 freeCodeCamp",
+        "url": "https://www.youtube.com/watch?v=7CqJlxBYj-M"
+      },
+      {
+        "title": "Full Stack Development with React & Node \u2013 Traversy Media",
+        "url": "https://www.youtube.com/watch?v=-0exw-9YJBo"
+      },
+      {
+        "title": "Full Stack Development Hindi \u2013 Apna College",
+        "url": "https://www.youtube.com/watch?v=06m5bXGYpUQ"
+      },
+      {
+        "title": "MERN Stack Hindi \u2013 Thapa Technical",
+        "url": "https://www.youtube.com/watch?v=dqhiSJ_mvIg"
+      },
+      {
+        "title": "Full Stack Web Dev Roadmap Hindi \u2013 CodeWithHarry",
+        "url": "https://www.youtube.com/watch?v=vErANaCOFDo"
+      }
+    ]
+  },
+  {
+    "skill": "DevOps",
+    "resources": [
+      {
+        "title": "DevOps Roadmap for Beginners \u2013 TechWorld with Nana",
+        "url": "https://www.youtube.com/watch?v=9pZ2xmsSDdo"
+      },
+      {
+        "title": "Docker Tutorial for Beginners \u2013 TechWorld with Nana",
+        "url": "https://www.youtube.com/watch?v=3c-iBn73dDE"
+      },
+      {
+        "title": "Complete DevOps Course \u2013 KodeKloud (freeCodeCamp)",
+        "url": "https://www.youtube.com/watch?v=j5Zsa_eOXeY"
+      },
+      {
+        "title": "DevOps Full Course Hindi \u2013 Shubham Londhe (TrainWithShubham)",
+        "url": "https://www.youtube.com/watch?v=cKBFbXKFcWQ"
+      },
+      {
+        "title": "Docker Tutorial Hindi \u2013 Abhishek Veeramalla",
+        "url": "https://www.youtube.com/watch?v=17Bl31rlnRM"
+      },
+      {
+        "title": "Kubernetes Beginner Course Hindi \u2013 Abhishek Veeramalla",
+        "url": "https://www.youtube.com/watch?v=KVBON1lA9N8"
+      }
+    ]
+  },
+  {
+    "skill": "DevSecOps",
+    "resources": [
+      {
+        "title": "DevSecOps Full Course for Beginners \u2013 freeCodeCamp",
+        "url": "https://www.youtube.com/watch?v=F5KJVuii0Yw"
+      },
+      {
+        "title": "DevSecOps Explained in 8 Minutes \u2013 TechWorld with Nana",
+        "url": "https://www.youtube.com/watch?v=nrhxNNH5lt0"
+      },
+      {
+        "title": "GitHub Actions CI/CD Security Pipeline \u2013 TechWorld with Nana",
+        "url": "https://www.youtube.com/watch?v=mFFXuXjVgkU"
+      },
+      {
+        "title": "DevSecOps Full Course Hindi \u2013 Abhishek Veeramalla",
+        "url": "https://www.youtube.com/watch?v=iBNJQgRmLks"
+      },
+      {
+        "title": "CI/CD Pipeline Hindi \u2013 TrainWithShubham",
+        "url": "https://www.youtube.com/watch?v=f7Wg-wJA4cA"
+      },
+      {
+        "title": "GitHub Actions Hindi \u2013 Abhishek Veeramalla",
+        "url": "https://www.youtube.com/watch?v=yfBtjLxn_6k"
+      }
+    ]
+  },
+  {
+    "skill": "Data Analyst",
+    "resources": [
+      {
+        "title": "Data Analysis with Python \u2013 Full Course \u2013 freeCodeCamp",
+        "url": "https://www.youtube.com/watch?v=r-uOLxNrNk8"
+      },
+      {
+        "title": "Excel for Data Analysts \u2013 Full Course \u2013 Kevin Stratvert",
+        "url": "https://www.youtube.com/watch?v=PSNXoAs2FtQ"
+      },
+      {
+        "title": "SQL for Data Analysis \u2013 Full Course \u2013 Alex The Analyst",
+        "url": "https://www.youtube.com/watch?v=CTFmDHvZj1k"
+      },
+      {
+        "title": "Data Analytics Full Course Hindi \u2013 CampusX",
+        "url": "https://www.youtube.com/watch?v=Vr-vCUGFMnk"
+      },
+      {
+        "title": "Python for Data Analysis Hindi \u2013 CodeWithHarry",
+        "url": "https://www.youtube.com/watch?v=gfDE2a7MKjA"
+      },
+      {
+        "title": "SQL Full Course Hindi \u2013 Apna College",
+        "url": "https://www.youtube.com/watch?v=hlGoQC332VM"
+      }
+    ]
+  },
+  {
+    "skill": "AI Engineer",
+    "resources": [
+      {
+        "title": "AI Engineer Roadmap \u2013 Full Beginner Guide \u2013 freeCodeCamp",
+        "url": "https://www.youtube.com/watch?v=5G4GhDlRJJg"
+      },
+      {
+        "title": "LangChain Full Course for Beginners \u2013 freeCodeCamp",
+        "url": "https://www.youtube.com/watch?v=lG7Uxts9SXs"
+      },
+      {
+        "title": "Build AI Apps with Python (OpenAI) \u2013 Tech With Tim",
+        "url": "https://www.youtube.com/watch?v=c_nCjlSB1Zk"
+      },
+      {
+        "title": "AI Engineering Roadmap Hindi \u2013 CampusX",
+        "url": "https://www.youtube.com/watch?v=1VSZtNYMntM"
+      },
+      {
+        "title": "LangChain Hindi Tutorial \u2013 CampusX",
+        "url": "https://www.youtube.com/watch?v=nAmC7SoVLd8"
+      },
+      {
+        "title": "OpenAI API Python Hindi \u2013 Krish Naik",
+        "url": "https://www.youtube.com/watch?v=CbpsDMwFG2g"
+      }
+    ]
+  },
+  {
+    "skill": "AI and Data Scientist",
+    "resources": [
+      {
+        "title": "Machine Learning Specialization (free lectures) \u2013 Andrew Ng",
+        "url": "https://www.youtube.com/watch?v=jGwO_UgTS7I"
+      },
+      {
+        "title": "Python for Data Science \u2013 Full Beginner Course \u2013 freeCodeCamp",
+        "url": "https://www.youtube.com/watch?v=LHBE6Q9XlzI"
+      },
+      {
+        "title": "Pandas & NumPy Full Tutorial \u2013 freeCodeCamp",
+        "url": "https://www.youtube.com/watch?v=GPVsHOlRBBI"
+      },
+      {
+        "title": "Machine Learning Full Course Hindi \u2013 CampusX",
+        "url": "https://www.youtube.com/watch?v=GwIo3gDZCVQ"
+      },
+      {
+        "title": "Data Science Roadmap Hindi \u2013 Krish Naik",
+        "url": "https://www.youtube.com/watch?v=k5lFGJnhLMY"
+      },
+      {
+        "title": "Pandas & NumPy Hindi \u2013 CodeWithHarry",
+        "url": "https://www.youtube.com/watch?v=RhEjmHeDNoA"
+      }
+    ]
+  },
+  {
+    "skill": "Data Engineer",
+    "resources": [
+      {
+        "title": "Data Engineering Full Course for Beginners \u2013 freeCodeCamp",
+        "url": "https://www.youtube.com/watch?v=ysn1S2TRNJ0"
+      },
+      {
+        "title": "Apache Spark Full Course \u2013 Krish Naik",
+        "url": "https://www.youtube.com/watch?v=S2MUhGA3lEw"
+      },
+      {
+        "title": "SQL Full Course for Beginners \u2013 Programming with Mosh",
+        "url": "https://www.youtube.com/watch?v=7S_tz1z_5bA"
+      },
+      {
+        "title": "Data Engineering Full Course Hindi \u2013 CampusX",
+        "url": "https://www.youtube.com/watch?v=Vr-vCUGFMnk"
+      },
+      {
+        "title": "Apache Spark Hindi \u2013 Krish Naik",
+        "url": "https://www.youtube.com/watch?v=S2MUhGA3lEw"
+      },
+      {
+        "title": "SQL for Data Engineering Hindi \u2013 Apna College",
+        "url": "https://www.youtube.com/watch?v=hlGoQC332VM"
+      }
+    ]
+  },
+  {
+    "skill": "Android",
+    "resources": [
+      {
+        "title": "Android Development for Beginners \u2013 Programming with Mosh",
+        "url": "https://www.youtube.com/watch?v=fis26HvvDII"
+      },
+      {
+        "title": "Kotlin Full Course for Beginners \u2013 freeCodeCamp",
+        "url": "https://www.youtube.com/watch?v=F9UC9DY-vIU"
+      },
+      {
+        "title": "Android Jetpack Compose Beginner Course \u2013 Philipp Lackner",
+        "url": "https://www.youtube.com/watch?v=cDabx3SjuOY"
+      },
+      {
+        "title": "Android Development Hindi \u2013 CodeWithHarry",
+        "url": "https://www.youtube.com/watch?v=mSAkAaKSCMI"
+      },
+      {
+        "title": "Kotlin Full Course Hindi \u2013 Smartherd",
+        "url": "https://www.youtube.com/watch?v=TEJEKnK7HqQ"
+      },
+      {
+        "title": "Jetpack Compose Hindi \u2013 Philipp Lackner (with Hindi CC)",
+        "url": "https://www.youtube.com/watch?v=6_wK_Ud8--0"
+      }
+    ]
+  },
+  {
+    "skill": "Machine Learning",
+    "resources": [
+      {
+        "title": "Machine Learning for Everybody \u2013 freeCodeCamp",
+        "url": "https://www.youtube.com/watch?v=i_LwzRVP7bg"
+      },
+      {
+        "title": "Scikit-Learn Full Tutorial \u2013 freeCodeCamp",
+        "url": "https://www.youtube.com/watch?v=0B5eIE_1vpU"
+      },
+      {
+        "title": "TensorFlow 2.0 Full Course \u2013 freeCodeCamp",
+        "url": "https://www.youtube.com/watch?v=tPYj3fFJGjk"
+      },
+      {
+        "title": "Machine Learning Full Course Hindi \u2013 CampusX",
+        "url": "https://www.youtube.com/watch?v=GwIo3gDZCVQ"
+      },
+      {
+        "title": "Scikit-Learn Hindi \u2013 Krish Naik",
+        "url": "https://www.youtube.com/watch?v=0Lt9w-BxKFQ"
+      },
+      {
+        "title": "Deep Learning Hindi \u2013 Krish Naik",
+        "url": "https://www.youtube.com/watch?v=YFNKnUhm_-8"
+      }
+    ]
+  },
+  {
+    "skill": "PostgreSQL",
+    "resources": [
+      {
+        "title": "PostgreSQL Tutorial for Beginners \u2013 Programming with Mosh",
+        "url": "https://www.youtube.com/watch?v=qw--VYLpxG4"
+      },
+      {
+        "title": "Learn PostgreSQL Full Course \u2013 freeCodeCamp",
+        "url": "https://www.youtube.com/watch?v=85pG_pDkITY"
+      },
+      {
+        "title": "PostgreSQL for Beginners \u2013 Corey Schafer",
+        "url": "https://www.youtube.com/watch?v=Dd2ej-QKrWY"
+      },
+      {
+        "title": "PostgreSQL Full Course Hindi \u2013 Apna College",
+        "url": "https://www.youtube.com/watch?v=SpfIwlAYaKk"
+      },
+      {
+        "title": "SQL & Databases Hindi \u2013 CodeWithHarry",
+        "url": "https://www.youtube.com/watch?v=hlGoQC332VM"
+      },
+      {
+        "title": "PostgreSQL Tutorial Hindi \u2013 Thapa Technical",
+        "url": "https://www.youtube.com/watch?v=3d6gqyh-rPE"
+      }
+    ]
+  },
+  {
+    "skill": "iOS",
+    "resources": [
+      {
+        "title": "iOS Development Course for Beginners \u2013 Angela Yu (100 Days)",
+        "url": "https://www.youtube.com/watch?v=comQ1-x2a1Q"
+      },
+      {
+        "title": "Swift Programming Full Course \u2013 freeCodeCamp",
+        "url": "https://www.youtube.com/watch?v=8Xg7E9shq0U"
+      },
+      {
+        "title": "SwiftUI Full Course for Beginners \u2013 Sean Allen",
+        "url": "https://www.youtube.com/watch?v=F2ojC6TNwws"
+      },
+      {
+        "title": "iOS Development Swift Hindi \u2013 Swiftable (Hindi)",
+        "url": "https://www.youtube.com/watch?v=09TeUXjzpKs"
+      },
+      {
+        "title": "SwiftUI Beginner Course Hindi \u2013 iOS with Mayur",
+        "url": "https://www.youtube.com/watch?v=F2ojC6TNwws"
+      },
+      {
+        "title": "Swift Programming Hindi \u2013 CodeWithChris (subtitles)",
+        "url": "https://www.youtube.com/watch?v=comQ1-x2a1Q"
+      }
+    ]
+  },
+  {
+    "skill": "Blockchain",
+    "resources": [
+      {
+        "title": "Blockchain Full Course for Beginners \u2013 freeCodeCamp",
+        "url": "https://www.youtube.com/watch?v=gyMwXuJrbJQ"
+      },
+      {
+        "title": "Solidity & Smart Contracts \u2013 Full Course \u2013 Patrick Collins (freeCodeCamp)",
+        "url": "https://www.youtube.com/watch?v=M576WGiDBdQ"
+      },
+      {
+        "title": "Web3 / Blockchain Development for Beginners \u2013 Dapp University",
+        "url": "https://www.youtube.com/watch?v=coQ5dg8wM2o"
+      },
+      {
+        "title": "Blockchain Full Course Hindi \u2013 Simplilearn Hindi",
+        "url": "https://www.youtube.com/watch?v=VBUP1RJFMJ4"
+      },
+      {
+        "title": "Solidity & Smart Contracts Hindi \u2013 WazirX (Hindi)",
+        "url": "https://www.youtube.com/watch?v=M576WGiDBdQ"
+      },
+      {
+        "title": "Web3 Beginner Course Hindi \u2013 Harkirat Singh",
+        "url": "https://www.youtube.com/watch?v=ERAxd8gl2Eg"
+      }
+    ]
+  },
+  {
+    "skill": "QA",
+    "resources": [
+      {
+        "title": "Software Testing Full Course for Beginners \u2013 freeCodeCamp",
+        "url": "https://www.youtube.com/watch?v=LdwqQLyQ7Uc"
+      },
+      {
+        "title": "Selenium WebDriver Full Course \u2013 Naveen AutomationLabs",
+        "url": "https://www.youtube.com/watch?v=FRn5J31eAMw"
+      },
+      {
+        "title": "Playwright Full Course for Beginners \u2013 Automation Step by Step",
+        "url": "https://www.youtube.com/watch?v=wawbt1cATsk"
+      },
+      {
+        "title": "Software Testing Full Course Hindi \u2013 SDET Unicorns",
+        "url": "https://www.youtube.com/watch?v=V1v1n3C3RFw"
+      },
+      {
+        "title": "Selenium WebDriver Hindi \u2013 Naveen AutomationLabs",
+        "url": "https://www.youtube.com/watch?v=FRn5J31eAMw"
+      },
+      {
+        "title": "Manual Testing Hindi \u2013 Naveenkhunteta",
+        "url": "https://www.youtube.com/watch?v=fqHMJbh8mMo"
+      }
+    ]
+  },
+  {
+    "skill": "Software Architect",
+    "resources": [
+      {
+        "title": "Software Architecture Full Course \u2013 freeCodeCamp",
+        "url": "https://www.youtube.com/watch?v=BrT3AO8bVQY"
+      },
+      {
+        "title": "System Design for Beginners \u2013 Neetcode",
+        "url": "https://www.youtube.com/watch?v=i53Gi_K3o7I"
+      },
+      {
+        "title": "Clean Code \u2013 Uncle Bob (Talks at Google)",
+        "url": "https://www.youtube.com/watch?v=7EmboKQH8lM"
+      },
+      {
+        "title": "System Design Hindi \u2013 Concept && Coding (Shrayansh)",
+        "url": "https://www.youtube.com/watch?v=i53Gi_K3o7I"
+      },
+      {
+        "title": "Low Level Design Hindi \u2013 Concept && Coding",
+        "url": "https://www.youtube.com/watch?v=B3zrIwz_t4M"
+      },
+      {
+        "title": "Design Patterns Hindi \u2013 CodeWithHarry",
+        "url": "https://www.youtube.com/watch?v=v9ejT8FO-dc"
+      }
+    ]
+  },
+  {
+    "skill": "Cyber Security",
+    "resources": [
+      {
+        "title": "Cybersecurity Full Course for Beginners \u2013 freeCodeCamp",
+        "url": "https://www.youtube.com/watch?v=U_P23SqJaDc"
+      },
+      {
+        "title": "Ethical Hacking Full Course \u2013 NetworkChuck",
+        "url": "https://www.youtube.com/watch?v=3Kq1MIfTWCE"
+      },
+      {
+        "title": "CompTIA Security+ Full Course \u2013 Professor Messer",
+        "url": "https://www.youtube.com/watch?v=KiEptGbnEBc"
+      },
+      {
+        "title": "Cyber Security Full Course Hindi \u2013 Great Learning Hindi",
+        "url": "https://www.youtube.com/watch?v=nzZkKoREEGo"
+      },
+      {
+        "title": "Ethical Hacking Hindi \u2013 CodeWithHarry",
+        "url": "https://www.youtube.com/watch?v=h9OGd9wu-GE"
+      },
+      {
+        "title": "Kali Linux & Penetration Testing Hindi \u2013 Hacking Talks",
+        "url": "https://www.youtube.com/watch?v=vk0d0L6d2kY"
+      }
+    ]
+  },
+  {
+    "skill": "UX Design",
+    "resources": [
+      {
+        "title": "UX Design Full Course for Beginners \u2013 Google (Coursera Preview)",
+        "url": "https://www.youtube.com/watch?v=uL2ZB7XXIgg"
+      },
+      {
+        "title": "Figma UI/UX Design Tutorial for Beginners \u2013 DesignCourse",
+        "url": "https://www.youtube.com/watch?v=jwCmIBJ8Jtc"
+      },
+      {
+        "title": "UI/UX Design Crash Course \u2013 Traversy Media",
+        "url": "https://www.youtube.com/watch?v=_Hp_dI0__qY"
+      },
+      {
+        "title": "UI/UX Design Full Course Hindi \u2013 Designtechroom",
+        "url": "https://www.youtube.com/watch?v=uL2ZB7XXIgg"
+      },
+      {
+        "title": "Figma Full Course Hindi \u2013 WsCubeTech",
+        "url": "https://www.youtube.com/watch?v=jwCmIBJ8Jtc"
+      },
+      {
+        "title": "UX Research & Design Hindi \u2013 Seek Learn",
+        "url": "https://www.youtube.com/watch?v=_Hp_dI0__qY"
+      }
+    ]
+  },
+  {
+    "skill": "Technical Writer",
+    "resources": [
+      {
+        "title": "Technical Writing Full Course \u2013 freeCodeCamp",
+        "url": "https://www.youtube.com/watch?v=GXN8bLhf5-4"
+      },
+      {
+        "title": "How to Write Good Documentation \u2013 Google Tech Writing",
+        "url": "https://www.youtube.com/watch?v=R6zeikbTgVc"
+      },
+      {
+        "title": "Technical Writing for Beginners \u2013 Joshua Fluke",
+        "url": "https://www.youtube.com/watch?v=CkBevnqGqkQ"
+      },
+      {
+        "title": "Technical Writing Hindi \u2013 Apna College",
+        "url": "https://www.youtube.com/watch?v=GXN8bLhf5-4"
+      },
+      {
+        "title": "Documentation & Writing for Developers Hindi \u2013 CodeWithHarry",
+        "url": "https://www.youtube.com/watch?v=R6zeikbTgVc"
+      },
+      {
+        "title": "Content & Technical Writing Career Hindi \u2013 Josh Talks",
+        "url": "https://www.youtube.com/watch?v=CkBevnqGqkQ"
+      }
+    ]
+  },
+  {
+    "skill": "Game Developer",
+    "resources": [
+      {
+        "title": "Godot Game Engine Full Course for Beginners \u2013 freeCodeCamp",
+        "url": "https://www.youtube.com/watch?v=nAh_Kx5Zh5Q"
+      },
+      {
+        "title": "Unity for Beginners Full Course \u2013 Brackeys",
+        "url": "https://www.youtube.com/watch?v=pwZpJzpE2lQ"
+      },
+      {
+        "title": "Unreal Engine 5 Beginner Tutorial \u2013 Gorka Games",
+        "url": "https://www.youtube.com/watch?v=k-zMkzmduqI"
+      },
+      {
+        "title": "Godot Game Development Hindi \u2013 Basics Bridge",
+        "url": "https://www.youtube.com/watch?v=nAh_Kx5Zh5Q"
+      },
+      {
+        "title": "Unity Game Dev Hindi \u2013 The WCG (Hindi)",
+        "url": "https://www.youtube.com/watch?v=pwZpJzpE2lQ"
+      },
+      {
+        "title": "C# for Game Dev Hindi \u2013 CodeWithHarry",
+        "url": "https://www.youtube.com/watch?v=SXaa61JWLDw"
+      }
+    ]
+  },
+  {
+    "skill": "Server Side Game Developer",
+    "resources": [
+      {
+        "title": "Multiplayer Game Server Architecture \u2013 Gaffer On Games (freeCodeCamp)",
+        "url": "https://www.youtube.com/watch?v=rX5X2mqBTUk"
+      },
+      {
+        "title": "Node.js Game Server Tutorial \u2013 freeCodeCamp",
+        "url": "https://www.youtube.com/watch?v=HXquxWtE5vA"
+      },
+      {
+        "title": "WebSocket & Multiplayer Backend \u2013 Fireship",
+        "url": "https://www.youtube.com/watch?v=1BfCnjr_Vjg"
+      },
+      {
+        "title": "Node.js Game Server Hindi \u2013 Thapa Technical",
+        "url": "https://www.youtube.com/watch?v=BLl32FvcdVM"
+      },
+      {
+        "title": "WebSocket & Realtime Apps Hindi \u2013 Apna College",
+        "url": "https://www.youtube.com/watch?v=7H_QH9nipNs"
+      },
+      {
+        "title": "Multiplayer Game Backend Hindi \u2013 CodeWithHarry",
+        "url": "https://www.youtube.com/watch?v=ooBxSMhjmko"
+      }
+    ]
+  }
+]
