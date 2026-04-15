@@ -12,8 +12,10 @@ import { AtsLinter } from './pages/AtsLinter';
 import { Settings } from './pages/Settings';
 
 export default function App() {
+  const basename = import.meta.env.BASE_URL;
+
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={basename}>
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Navigate to="/dashboard" replace />} />
