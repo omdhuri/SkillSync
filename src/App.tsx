@@ -12,7 +12,7 @@ import { AtsLinter } from './pages/AtsLinter';
 import { Settings } from './pages/Settings';
 
 export default function App() {
-  const basename = import.meta.env.BASE_URL;
+  const basename = import.meta.env.BASE_URL || (typeof window !== 'undefined' ? '/' : '/');
 
   return (
     <BrowserRouter basename={basename}>
