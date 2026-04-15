@@ -3,7 +3,6 @@
 // All AI-powered features call through these helpers
 // ================================================
 
-import { GoogleGenAI } from '@google/genai/web';
 import type {
     AptitudeQuestion,
     AtsReport,
@@ -12,66 +11,54 @@ import type {
     SkillGapResult,
 } from './types';
 
-// Get API key from environment - require it to be set
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
-
-// Initialize the client - only if API key is available
-let ai: GoogleGenAI | null = null;
-if (API_KEY) {
-    ai = new GoogleGenAI(API_KEY);
-} else {
-    console.warn('⚠️ VITE_GEMINI_API_KEY not set - AI features will not work');
-}
-
 const MODEL = 'gemini-2.0-flash';
 
-// Helper to check if AI is available
-function ensureAI(): GoogleGenAI {
-    if (!ai) {
-        throw new Error('Gemini API key not configured. Please set VITE_GEMINI_API_KEY in your .env file.');
+const isConfigured = !!API_KEY;
+
+async function callGemini(prompt: string, systemInstruction?: string): Promise<string> {
+    if (!isConfigured) {
+        throw new Error('Gemini API key not configured. Please set VITE_GEMINI_API_KEY in your environment.');
     }
-    return ai;
+
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: {
+                temperature: 0.7,
+                maxOutputTokens: 2048,
+                ...(systemInstruction && { systemInstruction: { parts: [{ text: systemInstruction }] } })
+            }
+        })
+    });
+
+    if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
 }
 
-// ---- Helpers ----
-
-/**
- * Send a prompt to Gemini and get the text response.
- */
-async function ask(prompt: string, systemInstruction?: string): Promise<string> {
-    const client = ensureAI();
-    const response = await client.models.generateContent({
-        model: MODEL,
-        contents: prompt,
-        config: systemInstruction ? { systemInstruction } : undefined,
-    });
-    return response.text ?? '';
-}
-
-/**
- * Send a prompt and parse the JSON response.
- */
-async function askJSON<T>(prompt: string, systemInstruction?: string): Promise<T> {
-    const client = ensureAI();
-    const response = await client.models.generateContent({
-        model: MODEL,
-        contents: prompt,
-        config: {
-            responseMimeType: 'application/json',
-            ...(systemInstruction ? { systemInstruction } : {}),
-        },
-    });
-    const text = response.text ?? '{}';
+async function callGeminiJSON<T>(prompt: string, systemInstruction?: string): Promise<T> {
+    const text = await callGemini(prompt, systemInstruction || 'Return valid JSON only.');
     return JSON.parse(text) as T;
+}
+
+async function ask(prompt: string, systemInstruction?: string): Promise<string> {
+    return callGemini(prompt, systemInstruction);
+}
+
+async function askJSON<T>(prompt: string, systemInstruction?: string): Promise<T> {
+    return callGeminiJSON<T>(prompt, systemInstruction);
 }
 
 // ================================================
 // Feature-Specific Functions
 // ================================================
 
-/**
- * RESUME BUILDER — Enhance bullet points with stronger action verbs & metrics.
- */
 export async function enhanceResumeBullets(bullets: string[]): Promise<string[]> {
     const result = await askJSON<{ bullets: string[] }>(
         `You are a professional resume writer. Enhance these resume bullet points to be more impactful.
@@ -88,9 +75,6 @@ Return a JSON object with a "bullets" array containing the enhanced versions in 
     return result.bullets;
 }
 
-/**
- * APTITUDE TEST — Generate questions for a given category and difficulty.
- */
 export async function generateAptitudeQuestions(
     category: string,
     difficulty: 'Easy' | 'Medium' | 'Hard',
@@ -117,9 +101,6 @@ Return a JSON object with a "questions" array.`
     return result.questions;
 }
 
-/**
- * MOCK INTERVIEW — Get an AI interviewer response in a conversation.
- */
 export async function chatWithInterviewer(
     history: { role: string; content: string }[],
     userMessage: string,
@@ -146,9 +127,6 @@ Your interview style:
     );
 }
 
-/**
- * MOCK INTERVIEW — Generate a feedback summary for the entire session.
- */
 export async function generateInterviewFeedback(
     messages: { role: string; content: string }[],
     topic: string
@@ -171,9 +149,6 @@ Return a JSON object with:
     );
 }
 
-/**
- * SKILL GAP ANALYZER — Analyze user skills against a target job role.
- */
 export async function analyzeSkillGap(
     userSkills: string[],
     targetRole: string,
@@ -198,9 +173,6 @@ Include 5-10 relevant skills in total. Be realistic about importance levels.`
     );
 }
 
-/**
- * ATS LINTER — Score a resume against ATS best practices.
- */
 export async function lintResumeForATS(resumeText: string): Promise<AtsReport> {
     return askJSON<AtsReport>(
         `You are an Applicant Tracking System (ATS) expert. Analyze this resume for ATS compatibility.
@@ -229,9 +201,6 @@ Include at least 2 passes, 1-3 warnings, and 0-2 errors. Be realistic.`
     );
 }
 
-/**
- * JOB SUGGESTIONS — Generate matched jobs based on user skills.
- */
 export async function generateJobSuggestions(
     skills: string[],
     targetRole?: string,
@@ -261,9 +230,6 @@ Return a JSON object with a "jobs" array. Sort by matchScore descending.`
     return result.jobs;
 }
 
-/**
- * RESUME BUILDER — Generate a professional summary from role, skills, and experience.
- */
 export async function generateProfessionalSummary(
     targetRole: string,
     skills: string[],
@@ -285,9 +251,6 @@ Requirements:
     );
 }
 
-/**
- * RESUME BUILDER — Rewrite a single bullet point for maximum impact.
- */
 export async function rewriteSingleBullet(bullet: string): Promise<string> {
     return ask(
         `Rewrite this resume bullet point to be more impactful and ATS-optimized.

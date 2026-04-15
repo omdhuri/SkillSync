@@ -55,11 +55,6 @@ export function LearningPaths() {
     return videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : null;
   };
 
-  const getChannelFromTitle = (title: string) => {
-    const dashIndex = title.lastIndexOf(' – ');
-    return dashIndex !== -1 ? title.substring(dashIndex + 3) : 'YouTube';
-  };
-
   return (
     <div className="space-y-6">
       {/* Header */}
