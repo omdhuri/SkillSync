@@ -53,6 +53,8 @@ export const KEYS = {
     APTITUDE_HISTORY: 'aptitude_history',
     INTERVIEW_HISTORY: 'interview_history',
     LEARNING_PROGRESS: 'learning_progress',
+    ROADMAP_SELECTION: 'selected_roadmap',
+    ROADMAP_PROGRESS: 'roadmap_progress',
     NOTIFICATIONS: 'notifications',
     SETTINGS: 'settings',
 } as const;
