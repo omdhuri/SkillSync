@@ -10,6 +10,7 @@ import {
   TrendingUp,
   Target
 } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 const modules = [
   {
@@ -17,7 +18,6 @@ const modules = [
     description: 'Step by step personalized career path.',
     href: '/roadmap',
     icon: Map,
-    color: 'bg-blue-500',
     lightColor: 'bg-blue-50 text-blue-600',
   },
   {
@@ -25,7 +25,6 @@ const modules = [
     description: 'AI builds resume automatically.',
     href: '/resume-builder',
     icon: FileText,
-    color: 'bg-emerald-500',
     lightColor: 'bg-emerald-50 text-emerald-600',
   },
   {
@@ -33,7 +32,6 @@ const modules = [
     description: 'AI powered unlimited practice tests.',
     href: '/aptitude-test',
     icon: BrainCircuit,
-    color: 'bg-orange-500',
     lightColor: 'bg-orange-50 text-orange-600',
   },
   {
@@ -41,7 +39,6 @@ const modules = [
     description: 'AI matched job and internship cards.',
     href: '/job-suggestions',
     icon: Briefcase,
-    color: 'bg-rose-500',
     lightColor: 'bg-rose-50 text-rose-600',
   },
   {
@@ -49,7 +46,6 @@ const modules = [
     description: 'AI scans resume vs job description.',
     href: '/skill-gap-analyzer',
     icon: Search,
-    color: 'bg-yellow-500',
     lightColor: 'bg-yellow-50 text-yellow-600',
   },
   {
@@ -57,31 +53,49 @@ const modules = [
     description: 'Free courses from top platforms.',
     href: '/learning-paths',
     icon: GraduationCap,
-    color: 'bg-pink-500',
     lightColor: 'bg-pink-50 text-pink-600',
   },
 ];
 
 export function Dashboard() {
+  const { user, profile } = useAuth();
+
+  // Derive first name: DB profile > Google metadata > email prefix > fallback
+  const firstName = (
+    profile?.full_name ||
+    user?.user_metadata?.full_name ||
+    user?.email?.split('@')[0] ||
+    'there'
+  ).split(' ')[0];
+
+  const skillsCount = profile?.skills?.length ?? 0;
+  const targetRole = profile?.target_role || 'your target role';
+  const skillsTotal = Math.max(skillsCount + 3, 15);
+  const skillsPercent = skillsCount > 0
+    ? `${Math.min(Math.round((skillsCount / skillsTotal) * 100), 100)}%`
+    : '0%';
+
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Welcome back, Felix</h1>
+        <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
+          Welcome back, <span className="text-indigo-600">{firstName}</span> 👋
+        </h1>
         <p className="text-slate-500 mt-1 text-lg">Here's your career progress overview. What would you like to focus on today?</p>
       </div>
 
       <div className="flex flex-col xl:flex-row gap-8">
-        
+
         {/* Left Column: Analytics & Metrics */}
         <div className="w-full xl:w-[35%] flex flex-col gap-6">
           <div className="flex items-center justify-between px-1">
             <h2 className="text-lg font-semibold text-slate-900">Analytics & Progress</h2>
           </div>
-          
+
           {/* Large Card: Sync Score & Actionable Insight */}
           <div className="bg-white/60 backdrop-blur-xl border border-white/80 shadow-sm rounded-3xl p-8 flex flex-col relative overflow-hidden group flex-1 min-h-[320px]">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl -mr-20 -mt-20 transition-transform group-hover:scale-110 duration-700"></div>
-            
+            <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl -mr-20 -mt-20 transition-transform group-hover:scale-110 duration-700" />
+
             <div className="flex items-center justify-between mb-8 relative z-10">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-2xl bg-indigo-500 text-white flex items-center justify-center shadow-lg shadow-indigo-500/30">
@@ -104,7 +118,22 @@ export function Dashboard() {
                   <div>
                     <h4 className="text-sm font-semibold text-slate-900">Actionable Insight</h4>
                     <p className="text-sm text-slate-600 mt-1 leading-relaxed">
-                      You are 3 skills away from qualifying for <span className="font-semibold text-slate-900">Frontend Developer</span> roles. Focus on <span className="font-medium text-indigo-600">TypeScript</span> next to boost your score to 85%.
+                      {skillsCount > 0 ? (
+                        <>
+                          You have{' '}
+                          <span className="font-semibold text-slate-900">{skillsCount} skills</span>{' '}
+                          listed. Keep levelling up towards{' '}
+                          <span className="font-semibold text-slate-900">{targetRole}</span> — add{' '}
+                          <span className="font-medium text-indigo-600">TypeScript</span> to boost your score.
+                        </>
+                      ) : (
+                        <>
+                          Add your skills in{' '}
+                          <span className="font-semibold text-slate-900">Settings</span> to unlock
+                          personalized insights for{' '}
+                          <span className="font-medium text-indigo-600">{targetRole}</span> roles.
+                        </>
+                      )}
                     </p>
                     <Link to="/learning-paths" className="inline-flex items-center gap-1 text-sm font-medium text-indigo-600 hover:text-indigo-700 mt-3">
                       View Learning Path <ArrowRight className="w-4 h-4" />
@@ -145,10 +174,16 @@ export function Dashboard() {
               <div>
                 <div className="text-sm font-medium text-slate-500 mb-1">Skills Mastered</div>
                 <div className="flex items-end justify-between">
-                  <div className="text-3xl font-bold text-slate-900">12<span className="text-lg text-slate-400">/15</span></div>
+                  <div className="text-3xl font-bold text-slate-900">
+                    {skillsCount}
+                    <span className="text-lg text-slate-400">/{skillsTotal}</span>
+                  </div>
                 </div>
                 <div className="w-full bg-slate-200 rounded-full h-1.5 mt-3">
-                  <div className="bg-amber-500 h-1.5 rounded-full" style={{ width: '80%' }}></div>
+                  <div
+                    className="bg-amber-500 h-1.5 rounded-full transition-all duration-500"
+                    style={{ width: skillsPercent }}
+                  />
                 </div>
               </div>
             </div>
@@ -160,11 +195,11 @@ export function Dashboard() {
           <div className="flex items-center justify-between px-1">
             <h2 className="text-lg font-semibold text-slate-900">Career Modules</h2>
           </div>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {modules.map((module) => (
-              <Link 
-                key={module.name} 
+              <Link
+                key={module.name}
                 to={module.href}
                 className="bg-white/60 backdrop-blur-xl border border-white/80 shadow-sm rounded-3xl p-6 hover:shadow-md hover:border-indigo-200 transition-all duration-300 group flex flex-col justify-between min-h-[160px]"
               >
