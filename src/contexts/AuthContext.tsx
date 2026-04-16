@@ -35,14 +35,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (error || !data) return;
 
-      // Auto-correct stale placeholder names with real Google data
       const realName = authMeta?.full_name || authMeta?.name;
       const realAvatar = authMeta?.avatar_url || authMeta?.picture;
-      const hasStaleData = realName && data.full_name !== realName;
+
+      const hasStaleData = (realName && data.full_name !== realName) || 
+                           data.full_name === 'Felix Developer' || 
+                           data.full_name === 'Felix';
 
       if (hasStaleData) {
         const updates: Record<string, string> = {};
-        if (realName) updates.full_name = realName;
+        // If they have no real name from auth, and name is Felix, wipe it to ''
+        updates.full_name = realName || (data.full_name.includes('Felix') ? '' : data.full_name);
+        
         if (realAvatar && data.avatar_url !== realAvatar) updates.avatar_url = realAvatar;
         // Fire-and-forget background update — never blocks UI
         supabase.from('profiles').update(updates).eq('id', userId).then(() => {});
@@ -58,12 +62,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let mounted = true;
 
-    // 1. Manually fetch the session immediately to cover production environments 
-    // where the initialization happens before our listener is ready.
+    // 1. Manually fetch the session immediately with a guaranteed fail-safe timeout.
+    // If Supabase's local storage lock hangs in production (known issue in some browsers),
+    // this timeout will force the UI to unblock after 2 seconds.
     async function getInitialSession() {
+      let resolved = false;
+      const timeout = setTimeout(() => {
+        if (!resolved && mounted) {
+           console.warn('[SkillSync Auth] Supabase getSession timed out. Forcing UI unblock.');
+           setLoading(false);
+        }
+      }, 2000);
+
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session }, error } = await supabase.auth.getSession();
+        resolved = true;
+        clearTimeout(timeout);
+        
         if (mounted) {
+          if (error) console.error('[SkillSync Auth] getSession error:', error);
           setSession(session);
           setUser(session?.user ?? null);
           setLoading(false); // Resolve loading safely
@@ -72,7 +89,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             fetchProfile(session.user.id, session.user.user_metadata as Record<string, string>);
           }
         }
-      } catch {
+      } catch (err) {
+        resolved = true;
+        clearTimeout(timeout);
+        console.error('[SkillSync Auth] getSession crashed:', err);
         if (mounted) setLoading(false);
       }
     }
