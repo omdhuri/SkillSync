@@ -81,7 +81,7 @@ export function Dashboard() {
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
-          Welcome back, <span className="text-indigo-600">{firstName}</span> 👋
+          Welcome to your Dashboard, <span className="text-indigo-600">{firstName}</span> 👋
         </h1>
         <p className="text-slate-500 mt-1 text-lg">Here's your career progress overview. What would you like to focus on today?</p>
       </div>
