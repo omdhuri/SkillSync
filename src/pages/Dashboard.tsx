@@ -60,10 +60,12 @@ const modules = [
 export function Dashboard() {
   const { user, profile } = useAuth();
 
-  // Derive first name: DB profile > Google metadata > email prefix > fallback
+  // Priority: Google/auth metadata (ground truth) > Supabase DB profile > email prefix
+  // Note: profile?.full_name may contain stale placeholder data if user never updated Settings
+  const authName = user?.user_metadata?.full_name || user?.user_metadata?.name;
   const firstName = (
+    authName ||
     profile?.full_name ||
-    user?.user_metadata?.full_name ||
     user?.email?.split('@')[0] ||
     'there'
   ).split(' ')[0];

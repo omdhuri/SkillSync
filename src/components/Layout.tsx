@@ -46,9 +46,10 @@ export function Layout() {
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
-  const displayName = profile?.full_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User';
+  const authName = user?.user_metadata?.full_name || user?.user_metadata?.name;
+  const displayName = authName || profile?.full_name || user?.email?.split('@')[0] || 'User';
   const displayEmail = profile?.email || user?.email || '';
-  const avatarUrl = profile?.avatar_url || user?.user_metadata?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${displayName}`;
+  const avatarUrl = profile?.avatar_url || user?.user_metadata?.avatar_url || user?.user_metadata?.picture || `https://api.dicebear.com/7.x/avataaars/svg?seed=${displayName}`;
 
   const handleSignOut = async () => {
     setIsProfileOpen(false);

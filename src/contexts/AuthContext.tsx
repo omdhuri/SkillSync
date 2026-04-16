@@ -27,14 +27,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Prevent double-firing onAuthStateChange on initial load
   const initialLoadDone = useRef(false);
 
-  const fetchProfile = async (userId: string) => {
+  const fetchProfile = async (userId: string, authMeta?: Record<string, string>) => {
     try {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .single();
-      if (!error && data) setProfile(data);
+      if (error || !data) return;
+
+      // Auto-correct stale placeholder names (e.g. "Felix Developer") with real Google data
+      const realName = authMeta?.full_name || authMeta?.name;
+      const realAvatar = authMeta?.avatar_url || authMeta?.picture;
+      const hasStaleData = realName && data.full_name !== realName;
+
+      if (hasStaleData) {
+        const updates: Record<string, string> = {};
+        if (realName) updates.full_name = realName;
+        if (realAvatar && data.avatar_url !== realAvatar) updates.avatar_url = realAvatar;
+        // Update in background — don't block UI
+        supabase.from('profiles').update(updates).eq('id', userId).then(() => {});
+        setProfile({ ...data, ...updates });
+      } else {
+        setProfile(data);
+      }
     } catch {
       // Profile fetch failure should never block the app
     }
@@ -48,8 +64,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false); // Unblock UI immediately — don't wait for profile
       initialLoadDone.current = true;
       if (session?.user) {
-        // Fetch profile in background — won't block navigation
-        fetchProfile(session.user.id);
+        // Pass auth metadata so auto-sync can fix stale Supabase data
+        fetchProfile(session.user.id, session.user.user_metadata as Record<string, string>);
       }
     }).catch(() => {
       // Even on error, always unblock the UI
@@ -68,7 +84,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (session?.user) {
           // Load profile in background — non-blocking
-          fetchProfile(session.user.id);
+          fetchProfile(session.user.id, session.user.user_metadata as Record<string, string>);
         } else {
           setProfile(null);
         }
