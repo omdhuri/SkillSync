@@ -1,33 +1,90 @@
 import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
+import { Eye, EyeOff, Mail, Lock, User, ArrowRight, Loader2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
+type Mode = 'signin' | 'signup';
+
 export function Login() {
-  const { signInWithGoogle, loading, session } = useAuth();
-  const [isLoading, setIsLoading] = useState(false);
+  const { signInWithGoogle, signInWithEmail, signUpWithEmail, loading, session } = useAuth();
+
+  const [mode, setMode] = useState<Mode>('signin');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
-  // Already logged in → go to dashboard
+  // Already logged in → go straight to dashboard
   if (session) return <Navigate to="/dashboard" replace />;
-
-  const handleGoogleSignIn = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      await signInWithGoogle();
-    } catch (err) {
-      setError('Failed to sign in. Please try again.');
-      setIsLoading(false);
-    }
-  };
 
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+        <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
       </div>
     );
   }
+
+  const handleGoogleSignIn = async () => {
+    try {
+      setGoogleLoading(true);
+      setError(null);
+      await signInWithGoogle();
+      // Page will redirect to Google — button stays in loading state
+    } catch {
+      setError('Failed to connect to Google. Please try again.');
+      setGoogleLoading(false);
+    }
+  };
+
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setSuccess(null);
+
+    if (!email || !password) {
+      setError('Please fill in all fields.');
+      return;
+    }
+    if (mode === 'signup' && !fullName.trim()) {
+      setError('Please enter your full name.');
+      return;
+    }
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters.');
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      if (mode === 'signin') {
+        await signInWithEmail(email, password);
+        // AuthContext → onAuthStateChange → ProtectedRoute lets them in
+      } else {
+        await signUpWithEmail(email, password, fullName);
+        setSuccess('Account created! Check your email to confirm your account, then sign in.');
+        setMode('signin');
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Something went wrong.';
+      if (msg.includes('Invalid login credentials')) {
+        setError('Incorrect email or password. Please try again.');
+      } else if (msg.includes('User already registered')) {
+        setError('An account with this email already exists. Sign in instead.');
+        setMode('signin');
+      } else if (msg.includes('Email not confirmed')) {
+        setError('Please confirm your email first — check your inbox.');
+      } else {
+        setError(msg);
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center relative overflow-hidden font-sans">
@@ -48,15 +105,15 @@ export function Login() {
       />
 
       {/* Card */}
-      <div className="relative z-10 w-full max-w-md mx-4">
+      <div className="relative z-10 w-full max-w-md mx-4 my-8">
         <div className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-3xl p-8 shadow-2xl shadow-black/40">
-          
-          {/* Logo + Brand */}
-          <div className="flex flex-col items-center mb-8">
+
+          {/* Logo */}
+          <div className="flex flex-col items-center mb-6">
             <div className="relative w-14 h-14 flex items-center justify-center mb-4">
               <div className="absolute inset-0 bg-indigo-500/20 rounded-2xl blur-xl" />
               <div className="relative bg-slate-900 border border-white/10 rounded-2xl w-14 h-14 flex items-center justify-center shadow-lg">
-                <svg viewBox="0 0 24 24" className="w-8 h-8 drop-shadow-sm" fill="none" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <svg viewBox="0 0 24 24" className="w-8 h-8" fill="none" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M 14 10 A 4 4 0 0 0 6 10 V 14 A 4 4 0 0 0 10 18 H 11" stroke="#6366f1" />
                   <path d="M 10 14 A 4 4 0 0 0 18 14 V 10 L 22 6" stroke="#f59e0b" />
                   <path d="M 17 6 L 22 6 L 22 11" stroke="#f59e0b" />
@@ -67,30 +124,114 @@ export function Login() {
             <p className="text-slate-400 text-sm mt-1">Your AI-powered career co-pilot</p>
           </div>
 
-          {/* Divider with text */}
-          <div className="mb-6">
-            <div className="text-center">
-              <h2 className="text-lg font-semibold text-white mb-1">Welcome back</h2>
-              <p className="text-slate-400 text-sm">Sign in to continue your journey</p>
-            </div>
+          {/* Mode Toggle */}
+          <div className="flex bg-white/5 border border-white/10 rounded-2xl p-1 mb-6">
+            <button
+              onClick={() => { setMode('signin'); setError(null); setSuccess(null); }}
+              className={`flex-1 py-2 text-sm font-semibold rounded-xl transition-all ${mode === 'signin' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
+            >
+              Sign In
+            </button>
+            <button
+              onClick={() => { setMode('signup'); setError(null); setSuccess(null); }}
+              className={`flex-1 py-2 text-sm font-semibold rounded-xl transition-all ${mode === 'signup' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
+            >
+              Sign Up
+            </button>
           </div>
 
-          {/* Error */}
+          {/* Alerts */}
           {error && (
-            <div className="mb-4 px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm text-center">
+            <div className="mb-4 px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm">
               {error}
             </div>
           )}
+          {success && (
+            <div className="mb-4 px-4 py-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400 text-sm">
+              {success}
+            </div>
+          )}
 
-          {/* Google Sign-In Button */}
+          {/* Email Form */}
+          <form onSubmit={handleEmailSubmit} className="space-y-3">
+            {mode === 'signup' && (
+              <div className="relative">
+                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                <input
+                  id="full-name"
+                  type="text"
+                  placeholder="Full Name"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500/50 transition-all"
+                />
+              </div>
+            )}
+
+            <div className="relative">
+              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+              <input
+                id="email"
+                type="email"
+                placeholder="Email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500/50 transition-all"
+              />
+            </div>
+
+            <div className="relative">
+              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+              <input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Password (min. 6 characters)"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full pl-10 pr-10 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500/50 transition-all"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+
+            <button
+              id="email-submit-btn"
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 shadow-lg shadow-indigo-600/30 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+            >
+              {isSubmitting ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <>
+                  {mode === 'signin' ? 'Sign In' : 'Create Account'}
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
+            </button>
+          </form>
+
+          {/* Divider */}
+          <div className="flex items-center gap-3 my-5">
+            <div className="flex-1 h-px bg-white/10" />
+            <span className="text-xs text-slate-500 font-medium">or continue with</span>
+            <div className="flex-1 h-px bg-white/10" />
+          </div>
+
+          {/* Google Button */}
           <button
             id="google-signin-btn"
             onClick={handleGoogleSignIn}
-            disabled={isLoading}
-            className="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-800 font-semibold py-3.5 px-6 rounded-2xl transition-all duration-200 shadow-lg shadow-black/20 hover:shadow-xl hover:shadow-black/30 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0 group"
+            disabled={googleLoading}
+            className="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-800 font-semibold py-3 px-6 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0"
           >
-            {isLoading ? (
-              <div className="w-5 h-5 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />
+            {googleLoading ? (
+              <Loader2 className="w-5 h-5 animate-spin text-slate-500" />
             ) : (
               <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -99,30 +240,12 @@ export function Login() {
                 <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
               </svg>
             )}
-            <span>{isLoading ? 'Signing in...' : 'Continue with Google'}</span>
+            <span>{googleLoading ? 'Redirecting to Google...' : 'Continue with Google'}</span>
           </button>
-
-          {/* Features preview */}
-          <div className="mt-8 pt-6 border-t border-white/10">
-            <p className="text-center text-xs text-slate-500 mb-4 font-medium uppercase tracking-wider">What's inside</p>
-            <div className="grid grid-cols-2 gap-2">
-              {[
-                { icon: '🎯', label: 'Skill Gap Analysis' },
-                { icon: '🗺️', label: 'Career Roadmap' },
-                { icon: '📄', label: 'Resume Builder' },
-                { icon: '💼', label: 'Job Matching' },
-              ].map((feature) => (
-                <div key={feature.label} className="flex items-center gap-2 bg-white/5 rounded-xl px-3 py-2.5">
-                  <span className="text-base">{feature.icon}</span>
-                  <span className="text-xs text-slate-300 font-medium">{feature.label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
 
           {/* Footer */}
           <p className="text-center text-xs text-slate-600 mt-6">
-            By signing in, you agree to our{' '}
+            By continuing, you agree to our{' '}
             <span className="text-slate-500 hover:text-slate-400 cursor-pointer transition-colors">Terms</span>
             {' '}and{' '}
             <span className="text-slate-500 hover:text-slate-400 cursor-pointer transition-colors">Privacy Policy</span>
