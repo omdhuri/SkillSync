@@ -280,11 +280,8 @@ export function Layout() {
                     <p className="text-xs text-slate-500 mt-0.5 truncate">{displayEmail}</p>
                   </div>
                   <div className="py-1">
-                    <NavLink to="/profile" onClick={() => setIsProfileOpen(false)} className="flex items-center gap-2.5 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-indigo-600 transition-colors">
-                      <User className="w-4 h-4" /> My Profile
-                    </NavLink>
                     <NavLink to="/settings" onClick={() => setIsProfileOpen(false)} className="flex items-center gap-2.5 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-indigo-600 transition-colors">
-                      <Settings className="w-4 h-4" /> Account Settings
+                      <User className="w-4 h-4" /> My Profile & Settings
                     </NavLink>
                   </div>
                   <div className="py-1 border-t border-slate-100">
