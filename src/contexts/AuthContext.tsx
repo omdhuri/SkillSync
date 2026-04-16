@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useRef, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import type { Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import type { Database } from '../lib/supabase';
@@ -24,8 +24,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
-  // Prevent double-firing onAuthStateChange on initial load
-  const initialLoadDone = useRef(false);
 
   const fetchProfile = async (userId: string, authMeta?: Record<string, string>) => {
     try {
@@ -34,9 +32,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .select('*')
         .eq('id', userId)
         .single();
+
       if (error || !data) return;
 
-      // Auto-correct stale placeholder names (e.g. "Felix Developer") with real Google data
+      // Auto-correct stale placeholder names with real Google data
       const realName = authMeta?.full_name || authMeta?.name;
       const realAvatar = authMeta?.avatar_url || authMeta?.picture;
       const hasStaleData = realName && data.full_name !== realName;
@@ -45,45 +44,52 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const updates: Record<string, string> = {};
         if (realName) updates.full_name = realName;
         if (realAvatar && data.avatar_url !== realAvatar) updates.avatar_url = realAvatar;
-        // Update in background — don't block UI
+        // Fire-and-forget background update — never blocks UI
         supabase.from('profiles').update(updates).eq('id', userId).then(() => {});
         setProfile({ ...data, ...updates });
       } else {
         setProfile(data);
       }
     } catch {
-      // Profile fetch failure should never block the app
+      // Silently ignore — never block the app for a profile fetch failure
     }
   };
 
   useEffect(() => {
-    // ── Step 1: Restore session instantly from localStorage (fast, no network) ──
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false); // Unblock UI immediately — don't wait for profile
-      initialLoadDone.current = true;
-      if (session?.user) {
-        // Pass auth metadata so auto-sync can fix stale Supabase data
-        fetchProfile(session.user.id, session.user.user_metadata as Record<string, string>);
+    let mounted = true;
+
+    // 1. Manually fetch the session immediately to cover production environments 
+    // where the initialization happens before our listener is ready.
+    async function getInitialSession() {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (mounted) {
+          setSession(session);
+          setUser(session?.user ?? null);
+          setLoading(false); // Resolve loading safely
+          
+          if (session?.user) {
+            fetchProfile(session.user.id, session.user.user_metadata as Record<string, string>);
+          }
+        }
+      } catch {
+        if (mounted) setLoading(false);
       }
-    }).catch(() => {
-      // Even on error, always unblock the UI
-      setLoading(false);
-      initialLoadDone.current = true;
-    });
+    }
+    
+    getInitialSession();
 
-    // ── Step 2: Listen for future auth changes (sign in, sign out, token refresh) ──
+    // 2. Listen for any future events (login, logout, token refresh).
+    // This perfectly works alongside getInitialSession without racing.
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        // Skip the INITIAL_SESSION event — already handled above
-        if (!initialLoadDone.current) return;
-
+      (_event, session) => {
+        if (!mounted) return;
+        
         setSession(session);
         setUser(session?.user ?? null);
+        setLoading(false);
 
         if (session?.user) {
-          // Load profile in background — non-blocking
           fetchProfile(session.user.id, session.user.user_metadata as Record<string, string>);
         } else {
           setProfile(null);
@@ -91,7 +97,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     );
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signInWithGoogle = async () => {
@@ -99,10 +108,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       provider: 'google',
       options: {
         redirectTo: `${window.location.origin}/dashboard`,
-        queryParams: {
-          // Skip Google account picker if already signed in — faster UX
-          prompt: 'select_account',
-        },
+        queryParams: { prompt: 'select_account' },
       },
     });
     if (error) throw error;
@@ -146,7 +152,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider value={{
       session, user, profile, loading,
       signInWithGoogle, signInWithEmail, signUpWithEmail,
-      signOut, updateProfile
+      signOut, updateProfile,
     }}>
       {children}
     </AuthContext.Provider>
