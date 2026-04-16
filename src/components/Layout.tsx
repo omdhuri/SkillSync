@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Outlet, NavLink, useLocation } from 'react-router-dom';
+import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import {
   LayoutDashboard,
   Map,
@@ -36,12 +37,24 @@ const navigation = [
 
 export function Layout() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, profile, signOut } = useAuth();
   const currentPathName = navigation.find(n => n.href === location.pathname)?.name || 'Dashboard';
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+
+  const displayName = profile?.full_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User';
+  const displayEmail = profile?.email || user?.email || '';
+  const avatarUrl = profile?.avatar_url || user?.user_metadata?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${displayName}`;
+
+  const handleSignOut = async () => {
+    setIsProfileOpen(false);
+    await signOut();
+    navigate('/login');
+  };
 
   // Close dropdowns when clicking outside (simplified with an overlay for this demo)
   const closeAllDropdowns = () => {
@@ -256,14 +269,14 @@ export function Layout() {
                   isProfileOpen ? "ring-2 ring-indigo-500/20 border-indigo-500 bg-indigo-50" : "border-indigo-200 bg-indigo-100 hover:border-indigo-300"
                 )}
               >
-                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="User" className="w-full h-full object-cover" />
+                <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover" />
               </button>
               
               {isProfileOpen && (
                 <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-slate-200 py-1 animate-in fade-in slide-in-from-top-2 duration-200">
                   <div className="px-4 py-3 border-b border-slate-100">
-                    <p className="text-sm font-semibold text-slate-800">Felix Doe</p>
-                    <p className="text-xs text-slate-500 mt-0.5">felix@skillsync.com</p>
+                    <p className="text-sm font-semibold text-slate-800 truncate">{displayName}</p>
+                    <p className="text-xs text-slate-500 mt-0.5 truncate">{displayEmail}</p>
                   </div>
                   <div className="py-1">
                     <NavLink to="/profile" onClick={() => setIsProfileOpen(false)} className="flex items-center gap-2.5 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-indigo-600 transition-colors">
@@ -274,7 +287,7 @@ export function Layout() {
                     </NavLink>
                   </div>
                   <div className="py-1 border-t border-slate-100">
-                    <button onClick={() => setIsProfileOpen(false)} className="flex w-full items-center gap-2.5 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                    <button onClick={handleSignOut} className="flex w-full items-center gap-2.5 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">
                       <LogOut className="w-4 h-4" /> Sign out
                     </button>
                   </div>

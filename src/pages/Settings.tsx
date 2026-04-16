@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { getData, setData, KEYS } from '../lib/storage';
 import type { UserProfile } from '../lib/types';
+import { useAuth } from '../contexts/AuthContext';
 
 const DEFAULT_PROFILE: UserProfile = {
   name: 'Felix Developer',
@@ -28,12 +29,43 @@ const DEFAULT_PROFILE: UserProfile = {
 };
 
 export function Settings() {
+  const { user, profile: authProfile, updateProfile } = useAuth();
   const [activeTab, setActiveTab] = useState('profile');
   const [profile, setProfile] = useState<UserProfile>(() =>
-    getData(KEYS.USER_PROFILE, DEFAULT_PROFILE)
+    getData(KEYS.USER_PROFILE, {
+      name: 'User',
+      email: '',
+      phone: '',
+      location: '',
+      linkedin: '',
+      portfolio: '',
+      bio: '',
+      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=User`,
+      skills: [],
+      targetRole: '',
+    })
   );
   const [saved, setSaved] = useState(false);
   const [skillInput, setSkillInput] = useState('');
+
+  // Sync form with auth profile when available
+  useEffect(() => {
+    if (authProfile || user) {
+      setProfile(prev => ({
+        ...prev,
+        name: authProfile?.full_name || user?.user_metadata?.full_name || prev.name,
+        email: authProfile?.email || user?.email || prev.email,
+        phone: authProfile?.phone || prev.phone,
+        location: authProfile?.location || prev.location,
+        linkedin: authProfile?.linkedin || prev.linkedin,
+        portfolio: authProfile?.portfolio || prev.portfolio,
+        bio: authProfile?.bio || prev.bio,
+        avatar: authProfile?.avatar_url || user?.user_metadata?.avatar_url || prev.avatar,
+        skills: authProfile?.skills?.length ? authProfile.skills : prev.skills,
+        targetRole: authProfile?.target_role || prev.targetRole,
+      }));
+    }
+  }, [authProfile, user]);
 
   const tabs = [
     { id: 'profile', label: 'Profile', icon: User },
@@ -42,8 +74,25 @@ export function Settings() {
     { id: 'integrations', label: 'Integrations', icon: LinkIcon },
   ];
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    // Save to localStorage as before
     setData(KEYS.USER_PROFILE, profile);
+    // Also persist to Supabase if authenticated
+    try {
+      await updateProfile({
+        full_name: profile.name,
+        email: profile.email,
+        phone: profile.phone,
+        location: profile.location,
+        linkedin: profile.linkedin,
+        portfolio: profile.portfolio,
+        bio: profile.bio,
+        target_role: profile.targetRole,
+        skills: profile.skills,
+      });
+    } catch {
+      // Silently continue — localStorage save already succeeded
+    }
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
