@@ -3,7 +3,7 @@
   # 🚀 SkillSync: AI-Powered Career Management System
 
   <p align="center">
-    A comprehensive, intelligent platform designed to streamline career progression, from resume building to skill analysis and interview prep.
+    A comprehensive, intelligent platform designed to streamline career progression with personalized roadmaps, resume building, and skill analysis.
   </p>
 
   <div>
@@ -11,7 +11,7 @@
     <img src="https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E" alt="Vite" />
     <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" />
     <img src="https://img.shields.io/badge/Google_Gemini-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="Gemini AI" />
-    <img src="https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase" />
+    <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
   </div>
 </div>
 
@@ -27,30 +27,34 @@ Whether you are optimizing your CV for Applicant Tracking Systems (ATS), practic
 
 ## 🔥 Key Features
 
-### 📄 Intelligent Resume Builder & ATS Linter
+### 🗺️ Interactive Career Roadmaps
+- **23 Career Paths:** Choose from Frontend, Backend, Full-Stack, Data Science, DevOps, and 18+ other career tracks.
+- **Progress Tracking:** Mark topics as complete and track your learning progress with visual progress bars.
+- **PDF Downloads:** Download detailed roadmap PDFs for each career path with complete learning guides.
+- **Auto-Save:** Your progress is automatically saved locally, so you can pick up where you left off.
+
+### 📄 Intelligent Resume Builder
 - **Dynamic Builder:** Craft beautifully formatted, modern resumes in real-time.
 - **PDF Export:** Instantly download your polished resume as a high-quality PDF.
-- **AI-Powered ATS Linter:** Upload your resume to receive a comprehensive score and actionable feedback, modeled after real-world Applicant Tracking Systems (ATS).
+- **AI Suggestions:** Get AI-powered suggestions to improve your resume content.
 
 ### 🧠 General Aptitude Test
 - **Adaptive Testing:** Evaluate your cognitive, logical, and problem-solving skills through a generalized aptitude test.
 - **Instant Analytics:** Receive immediate performance breakdowns, including accuracy, category strengths, and weak areas.
 - **Sleek UI:** Enjoy a premium testing interface with animations, timer tracking, and easy navigation.
 
-### 🎙️ AI Mock Interviews
-- **Simulated Practice:** Engage in simulated job interviews powered by the Google Gemini API.
-- **Real-time Feedback:** Receive constructive criticism on your answers to improve your technical and behavioral communication.
-
 ### 📊 Skill Gap Analyzer & Learning Paths
 - **Market Analysis:** Compare your current skill set against active market demands for your desired role.
 - **Tailored Upskilling:** Get personalized, curated resources and learning paths to bridge identified skill gaps efficiently.
+- **YouTube Integration:** Access curated video tutorials for each skill from top educators.
 
-### 💼 Job Suggestions & Salary Benchmarking
+### 💼 Job Suggestions
 - **Role Recommendations:** Discover roles tailored to your unique profile and career goals.
 - **Market Insights:** Compare industry standard salaries across various job roles to ensure you know your worth.
 
-### 🗺️ Visual Dashboards & Roadmaps
-- **Track Progress:** Use the visual dashboard and interactive roadmaps to monitor milestones and recent career activities.
+### 📈 Visual Dashboard
+- **Sync Score:** Track your market readiness with a personalized career score.
+- **Progress Metrics:** Monitor skills mastered, active applications, and roadmap progress at a glance.
 
 ---
 
@@ -59,9 +63,9 @@ Whether you are optimizing your CV for Applicant Tracking Systems (ATS), practic
 SkillSync utilizes a modern client-heavy architecture, leveraging the power of **Vite** and **React** for lightning-fast UI delivery.
 
 1. **Client-Side Rendering (CSR):** The entire application interface and routing are handled client-side via React and React Router DOM, ensuring smooth page transitions and a native-app feel.
-2. **AI Inference & Data Processing:** Heavy cognitive tasks, such as the ATS scoring, Mock Interviews, and Skill Gap Analysis, are powered by integrating the **Google Gemini API**. Prompts and contexts are constructed client-side and sent directly to the AI model for real-time natural language processing.
-3. **State & Analytics:** Visual analytics (using Recharts) and test states are managed dynamically within React hooks, providing immediate feedback loops (like the Aptitude Test results).
-4. **Future Backend (Supabase):** While currently utilizing local/client state handling, the architecture is designed to seamlessly integrate with **Supabase** in the future for robust user authentication, persistent data storage, and scalable backend services.
+2. **AI Inference & Data Processing:** Heavy cognitive tasks, such as resume parsing, skill gap analysis, and job matching, are powered by integrating the **Google Gemini API**. Prompts and contexts are constructed client-side and sent directly to the AI model for real-time natural language processing.
+3. **Local Persistence:** User progress (roadmap completion, settings) is stored in `localStorage` for instant access and offline capability.
+4. **State & Analytics:** Visual analytics and test states are managed dynamically within React hooks, providing immediate feedback loops (like the Aptitude Test results).
 
 ---
 
@@ -74,7 +78,6 @@ SkillSync utilizes a modern client-heavy architecture, leveraging the power of *
 
 ### Styling & Animations
 - **Tailwind CSS (v4):** Utility-first CSS framework for rapid UI development and premium aesthetics.
-- **Framer Motion:** Powerful animation library powering the smooth transitions and micro-interactions throughout the app.
 - **Lucide React:** Clean, beautiful SVG icons.
 
 ### Data Visualization & Utilities
@@ -82,11 +85,11 @@ SkillSync utilizes a modern client-heavy architecture, leveraging the power of *
 - **React Router DOM (v7):** For declarative routing and navigation.
 - **React PDF:** Client-side document generation for the Resume Builder.
 
-### AI Integration & (Planned) Backend
-- **Google Gemini API (`@google/genai`):** The core intelligence behind the resume parsing, interview feedback, and skill analysis.
-- **Express (Backend Layer):** Structured for API handling.
-- **Supabase:** The planned scalable backend for Auth, Database, and Edge Functions.
-- **SQLite (`better-sqlite3`):** Current lightweight relational database schema handling.
+### AI Integration
+- **Google Gemini API (`@google/genai`):** The core intelligence behind the resume parsing, skill analysis, and job matching.
+
+### Local Storage
+- **localStorage:** User progress and settings stored client-side for instant access.
 
 ---
 

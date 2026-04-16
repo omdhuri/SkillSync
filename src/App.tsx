@@ -6,9 +6,7 @@ import { Roadmap } from './pages/Roadmap';
 import { JobSuggestions } from './pages/JobSuggestions';
 import { ResumeBuilder } from './pages/ResumeBuilder';
 import { AptitudeTest } from './pages/AptitudeTest';
-import { MockInterview } from './pages/MockInterview';
 import { LearningPaths } from './pages/LearningPaths';
-import { AtsLinter } from './pages/AtsLinter';
 import { Settings } from './pages/Settings';
 
 export default function App() {
@@ -23,11 +21,9 @@ export default function App() {
           <Route path="roadmap" element={<Roadmap />} />
           <Route path="resume-builder" element={<ResumeBuilder />} />
           <Route path="aptitude-test" element={<AptitudeTest />} />
-          <Route path="mock-interview" element={<MockInterview />} />
           <Route path="job-suggestions" element={<JobSuggestions />} />
           <Route path="skill-gap-analyzer" element={<SkillGapAnalyzer />} />
           <Route path="learning-paths" element={<LearningPaths />} />
-          <Route path="ats-linter" element={<AtsLinter />} />
           <Route path="settings" element={<Settings />} />
         </Route>
       </Routes>

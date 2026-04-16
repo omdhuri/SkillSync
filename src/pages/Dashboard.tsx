@@ -1,13 +1,11 @@
 import { Link } from 'react-router-dom';
-import { 
-  Map, 
-  FileText, 
-  BrainCircuit, 
-  Mic, 
-  Briefcase, 
-  Search, 
-  GraduationCap, 
-  CheckSquare,
+import {
+  Map,
+  FileText,
+  BrainCircuit,
+  Briefcase,
+  Search,
+  GraduationCap,
   ArrowRight,
   TrendingUp,
   Target
@@ -39,14 +37,6 @@ const modules = [
     lightColor: 'bg-orange-50 text-orange-600',
   },
   {
-    name: 'Mock Interview',
-    description: 'Practice with AI interviewer anytime.',
-    href: '/mock-interview',
-    icon: Mic,
-    color: 'bg-purple-500',
-    lightColor: 'bg-purple-50 text-purple-600',
-  },
-  {
     name: 'Job Suggestions',
     description: 'AI matched job and internship cards.',
     href: '/job-suggestions',
@@ -69,14 +59,6 @@ const modules = [
     icon: GraduationCap,
     color: 'bg-pink-500',
     lightColor: 'bg-pink-50 text-pink-600',
-  },
-  {
-    name: 'ATS Checker',
-    description: 'ATS compatibility score meter.',
-    href: '/ats-linter',
-    icon: CheckSquare,
-    color: 'bg-indigo-500',
-    lightColor: 'bg-indigo-50 text-indigo-600',
   },
 ];
 

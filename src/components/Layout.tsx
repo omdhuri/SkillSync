@@ -1,19 +1,16 @@
 import { useState } from 'react';
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Map, 
-  FileText, 
-  BrainCircuit, 
-  Mic, 
-  Briefcase, 
-  Search, 
-  GraduationCap, 
-  CheckSquare,
+import {
+  LayoutDashboard,
+  Map,
+  FileText,
+  BrainCircuit,
+  Briefcase,
+  Search,
+  GraduationCap,
   Bell,
   Search as SearchIcon,
   Settings,
-  Sparkles,
   Menu,
   X,
   User,
@@ -32,11 +29,9 @@ const navigation = [
   { name: 'Roadmap', href: '/roadmap', icon: Map },
   { name: 'Resume Builder', href: '/resume-builder', icon: FileText },
   { name: 'Aptitude Test', href: '/aptitude-test', icon: BrainCircuit },
-  { name: 'Mock Interview', href: '/mock-interview', icon: Mic },
   { name: 'Job Suggestions', href: '/job-suggestions', icon: Briefcase },
   { name: 'Skill Gap', href: '/skill-gap-analyzer', icon: Search },
   { name: 'Learning Paths', href: '/learning-paths', icon: GraduationCap },
-  { name: 'ATS Linter', href: '/ats-linter', icon: CheckSquare },
 ];
 
 export function Layout() {
