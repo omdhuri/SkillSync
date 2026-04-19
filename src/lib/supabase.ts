@@ -25,6 +25,7 @@ export type Database = {
           bio: string | null;
           target_role: string | null;
           skills: string[];
+          resume_data: any | null;
           created_at: string;
           updated_at: string;
         };
@@ -40,6 +41,7 @@ export type Database = {
           bio?: string | null;
           target_role?: string | null;
           skills?: string[];
+          resume_data?: any | null;
         };
         Update: {
           full_name?: string | null;
@@ -52,6 +54,7 @@ export type Database = {
           bio?: string | null;
           target_role?: string | null;
           skills?: string[];
+          resume_data?: any | null;
         };
       };
     };

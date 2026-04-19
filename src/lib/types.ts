@@ -94,61 +94,6 @@ export interface Milestone {
     progress?: number;
 }
 
-// --- Aptitude Test ---
-export interface AptitudeQuestion {
-    id: number;
-    category: string;
-    difficulty: 'Easy' | 'Medium' | 'Hard';
-    text: string;
-    options: string[];
-    correct: number;
-    explanation?: string;
-}
-
-export interface AptitudeResult {
-    date: string;
-    score: number;
-    total: number;
-    percentile: number;
-    weakAreas: string[];
-}
-
-// --- Mock Interview ---
-export interface InterviewMessage {
-    role: 'interviewer' | 'user';
-    content: string;
-    timestamp: number;
-}
-
-export interface InterviewSession {
-    id: string;
-    topic: string;
-    role: string;
-    messages: InterviewMessage[];
-    feedback?: InterviewFeedback;
-    date: string;
-}
-
-export interface InterviewFeedback {
-    overallScore: number;
-    strengths: string[];
-    improvements: string[];
-    summary: string;
-}
-
-// --- Job Suggestions ---
-export interface Job {
-    id: number;
-    title: string;
-    company: string;
-    location: string;
-    salary: string;
-    matchScore: number;
-    type: string;
-    posted: string;
-    skills: string[];
-    description: string;
-}
 
 // --- Skill Gap ---
 export interface SkillGapSkill {
@@ -162,20 +107,6 @@ export interface SkillGapResult {
     matchPercentage: number;
     matchedSkills: SkillGapSkill[];
     missingSkills: SkillGapSkill[];
-}
-
-// --- ATS Linter ---
-export type AtsIssueType = 'error' | 'warning' | 'pass';
-
-export interface AtsIssue {
-    type: AtsIssueType;
-    title: string;
-    description: string;
-}
-
-export interface AtsReport {
-    score: number;
-    issues: AtsIssue[];
 }
 
 // --- Learning Paths ---

@@ -225,7 +225,7 @@ export function Settings() {
               {/* Skills Section */}
               <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                 <h3 className="text-lg font-semibold text-slate-900 mb-4">Your Skills</h3>
-                <p className="text-sm text-slate-500 mb-4">These skills are used across SkillSync for AI matching, gap analysis, and job suggestions.</p>
+                <p className="text-sm text-slate-500 mb-4">These skills are used across SkillSync for gap analysis and job suggestions.</p>
 
                 <div className="flex flex-wrap gap-2 mb-4">
                   {profile.skills.map((skill) => (

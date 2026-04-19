@@ -28,11 +28,11 @@ export function cn(...inputs: ClassValue[]) {
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Roadmap', href: '/roadmap', icon: Map },
+  { name: 'Learning Paths', href: '/learning-paths', icon: GraduationCap },
   { name: 'Resume Builder', href: '/resume-builder', icon: FileText },
   { name: 'Aptitude Test', href: '/aptitude-test', icon: BrainCircuit },
-  { name: 'Job Suggestions', href: '/job-suggestions', icon: Briefcase },
   { name: 'Skill Gap', href: '/skill-gap-analyzer', icon: Search },
-  { name: 'Learning Paths', href: '/learning-paths', icon: GraduationCap },
+  { name: 'Job Suggestions', href: '/job-suggestions', icon: Briefcase },
 ];
 
 export function Layout() {

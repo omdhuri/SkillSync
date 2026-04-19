@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import {
-  FileText, Download, Wand2, Plus, Trash2,
-  CheckCircle2, Sparkles, Loader2, User, Briefcase,
+  FileText, Download, Plus, Trash2,
+  CheckCircle2, User, Briefcase,
   GraduationCap, Code2, Save, RotateCcw, Award, FolderOpen, Star
 } from 'lucide-react';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import { ClassicResumePDF, AcademicResumePDF, ModernResumePDF } from './ResumeBuilderPDF';
 import { getData, setData, KEYS } from '../lib/storage';
-import { enhanceResumeBullets, generateProfessionalSummary } from '../lib/gemini';
 import type { ResumeData, ResumeProject, ResumeCertification, SkillCategories } from '../lib/types';
 
 // ─── Rich sample template (shown on first load) ────────────────────────────────
@@ -60,9 +60,9 @@ const SAMPLE_DATA: ResumeData = {
   projects: [
     {
       id: 1,
-      name: 'DevFlow — AI Code Review Tool',
-      description: 'Open-source VS Code extension for automated code review using OpenAI API. 2,000+ installs on the marketplace.',
-      tech: 'TypeScript, VS Code API, OpenAI, Node.js',
+      name: 'DevFlow — Automated Code Review Tool',
+      description: 'Open-source VS Code extension for automated code reviews. 2,000+ installs on the marketplace.',
+      tech: 'TypeScript, VS Code API, Node.js',
       link: 'github.com/alex/devflow',
       date: 'Jan 2023',
     },
@@ -80,7 +80,7 @@ const SAMPLE_DATA: ResumeData = {
     { id: 2, name: 'Google Professional Cloud Developer', issuer: 'Google Cloud', date: 'Nov 2022' },
   ],
   achievements: [
-    'Winner – HackBerkeley 2023 (500+ participants): built an AI-powered accessibility tool in 24 hours.',
+    'Winner – HackBerkeley 2023 (500+ participants): built an accessibility tool in 24 hours.',
     'Top 1% contributor on Stack Overflow — 2,500+ reputation with 150+ answers in React & TypeScript.',
   ],
   skills: 'React, TypeScript, JavaScript, Node.js, Python, PostgreSQL, MongoDB, Redis, AWS, Docker, Git, GraphQL, Tailwind CSS, Next.js',
@@ -116,8 +116,6 @@ function buildDefaultData(): ResumeData {
 function nextId(items: { id: number }[]) {
   return items.length > 0 ? Math.max(...items.map((i) => i.id)) + 1 : 1;
 }
-
-type EnhanceState = 'idle' | 'loading' | 'done' | 'error';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PDF GENERATOR
@@ -260,6 +258,8 @@ function generatePrintHTML(data: ResumeData): string {
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export function ResumeBuilder() {
+  const { user, profile: authProfile, updateProfile } = useAuth();
+
   const [data, setResumeData] = useState<ResumeData>(() => {
     const defaults = buildDefaultData();
     const stored = getData<Partial<ResumeData>>(KEYS.RESUME_DATA, {});
@@ -280,16 +280,29 @@ export function ResumeBuilder() {
 
   const [saved, setSaved] = useState(false);
   const [template, setTemplate] = useState<'classic' | 'academic' | 'modern'>('classic');
-  const [enhanceState, setEnhanceState] = useState<Record<number, EnhanceState>>({});
-  const [globalEnhancing, setGlobalEnhancing] = useState(false);
-  const [summaryGenerating, setSummaryGenerating] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  // Load from Supabase if available
+  useEffect(() => {
+    if (authProfile?.resume_data) {
+      setResumeData(authProfile.resume_data as ResumeData);
+    }
+  }, [authProfile?.resume_data]);
 
   // ── Persistence ──
-  const handleSave = () => {
+  const handleSave = async () => {
+    // 1. Save locally
     setData(KEYS.RESUME_DATA, data);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
+
+    // 2. Save to Supabase globally
+    if (user) {
+      try {
+        await updateProfile({ resume_data: data });
+      } catch {
+        // Silently continue if cloud save fails
+      }
+    }
   };
   const handleReset = () => setResumeData(buildDefaultData());
 
@@ -355,54 +368,6 @@ export function ResumeBuilder() {
   const removeAchievement = (idx: number) =>
     setResumeData((d) => ({ ...d, achievements: d.achievements.filter((_, i) => i !== idx) }));
 
-  // ── AI: Summary ──
-  const handleGenerateSummary = async () => {
-    setSummaryGenerating(true);
-    setErrorMsg(null);
-    try {
-      const profile = getData(KEYS.USER_PROFILE, null as any);
-      const skills = (profile?.skills ?? data.skills.split(',').map((s: string) => s.trim()));
-      const role = profile?.targetRole ?? data.experience[0]?.role ?? 'Software Engineer';
-      const summary = await generateProfessionalSummary(role, skills, '2+');
-      setResumeData((d) => ({ ...d, summary }));
-    } catch { setErrorMsg('Could not generate summary. Check your API key.'); }
-    finally { setSummaryGenerating(false); }
-  };
-
-  // ── AI: Enhance one experience ──
-  const handleEnhanceOne = async (expId: number) => {
-    const exp = data.experience.find((e) => e.id === expId);
-    if (!exp) return;
-    const nonEmpty = exp.bullets.filter((b) => b.trim());
-    if (!nonEmpty.length) { setErrorMsg('Add at least one bullet before enhancing.'); setTimeout(() => setErrorMsg(null), 3000); return; }
-    setEnhanceState((s) => ({ ...s, [expId]: 'loading' }));
-    setErrorMsg(null);
-    try {
-      const enhanced = await enhanceResumeBullets(nonEmpty);
-      let ei = 0;
-      setResumeData((d) => ({ ...d, experience: d.experience.map((e) => e.id === expId ? { ...e, bullets: e.bullets.map((b) => b.trim() ? (enhanced[ei++] ?? b) : b) } : e) }));
-      setEnhanceState((s) => ({ ...s, [expId]: 'done' }));
-      setTimeout(() => setEnhanceState((s) => ({ ...s, [expId]: 'idle' })), 3000);
-    } catch {
-      setEnhanceState((s) => ({ ...s, [expId]: 'error' }));
-      setErrorMsg('AI enhancement failed. Check your API key.');
-      setTimeout(() => { setEnhanceState((s) => ({ ...s, [expId]: 'idle' })); setErrorMsg(null); }, 4000);
-    }
-  };
-
-  // ── AI: Enhance all ──
-  const handleEnhanceAll = async () => {
-    setGlobalEnhancing(true); setErrorMsg(null);
-    try {
-      const allBullets = data.experience.flatMap((e) => e.bullets.filter((b) => b.trim()));
-      if (!allBullets.length) { setErrorMsg('No bullet points to enhance.'); setGlobalEnhancing(false); return; }
-      const enhanced = await enhanceResumeBullets(allBullets);
-      let ei = 0;
-      setResumeData((d) => ({ ...d, experience: d.experience.map((exp) => ({ ...exp, bullets: exp.bullets.map((b) => b.trim() ? (enhanced[ei++] ?? b) : b) })) }));
-    } catch { setErrorMsg('Global enhancement failed. Try again.'); }
-    finally { setGlobalEnhancing(false); }
-  };
-
   const inp = 'w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors';
   const lbl = 'block text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-widest';
 
@@ -412,19 +377,14 @@ export function ResumeBuilder() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 flex-shrink-0">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
-            <FileText className="w-6 h-6 text-indigo-600" /> AI Resume Builder
+            <FileText className="w-6 h-6 text-indigo-600" /> Resume Builder
           </h1>
-          <p className="text-slate-500 mt-0.5 text-sm">Build, edit, and AI-enhance your ATS-optimized resume.</p>
+          <p className="text-slate-500 mt-0.5 text-sm">Build, edit, and enhance your ATS-optimized resume.</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          {errorMsg && <span className="text-xs font-medium text-rose-600 bg-rose-50 border border-rose-200 px-3 py-1.5 rounded-lg">{errorMsg}</span>}
           {saved && <span className="flex items-center gap-1.5 text-xs font-medium text-emerald-600 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-lg"><CheckCircle2 className="w-3.5 h-3.5" /> Saved</span>}
           <button onClick={handleReset} className="flex items-center gap-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 hover:border-slate-300 px-3 py-2 rounded-lg transition-colors"><RotateCcw className="w-4 h-4" /> Reset</button>
           <button onClick={handleSave} className="flex items-center gap-1.5 text-sm font-medium text-slate-700 bg-white border border-slate-200 hover:border-indigo-300 hover:text-indigo-600 px-3 py-2 rounded-lg transition-colors"><Save className="w-4 h-4" /> Save</button>
-          <button onClick={handleEnhanceAll} disabled={globalEnhancing} className="flex items-center gap-1.5 text-sm font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-3 py-2 rounded-lg transition-colors disabled:opacity-60">
-            {globalEnhancing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-            {globalEnhancing ? 'Enhancing…' : 'Enhance All with AI'}
-          </button>
           <PDFDownloadLink
             document={
               template === 'academic' ? <AcademicResumePDF data={data} /> :
@@ -465,14 +425,8 @@ export function ResumeBuilder() {
             <Section
               icon={<Star className="w-4 h-4 text-indigo-500" />}
               title="Professional Summary"
-              action={
-                <button onClick={handleGenerateSummary} disabled={summaryGenerating} className="flex items-center gap-1 text-xs font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2.5 py-1 rounded-md disabled:opacity-60 transition-colors">
-                  {summaryGenerating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Wand2 className="w-3 h-3" />}
-                  {summaryGenerating ? 'Generating…' : 'Generate with AI'}
-                </button>
-              }
             >
-              <textarea rows={3} value={data.summary} onChange={(e) => setResumeData((d) => ({ ...d, summary: e.target.value }))} placeholder="A results-driven engineer… or click Generate with AI" className={`${inp} resize-none`} />
+              <textarea rows={3} value={data.summary} onChange={(e) => setResumeData((d) => ({ ...d, summary: e.target.value }))} placeholder="A results-driven engineer…" className={`${inp} resize-none`} />
             </Section>
 
             <Divider />
@@ -484,10 +438,8 @@ export function ResumeBuilder() {
               action={<button onClick={addExperience} className="flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:text-indigo-700"><Plus className="w-3.5 h-3.5" /> Add Role</button>}
             >
               <div className="space-y-5">
-                {data.experience.map((exp) => {
-                  const st = enhanceState[exp.id] ?? 'idle';
-                  return (
-                    <div key={exp.id} className="bg-slate-50 rounded-xl border border-slate-200 p-4 relative group">
+                {data.experience.map((exp) => (
+                  <div key={exp.id} className="bg-slate-50 rounded-xl border border-slate-200 p-4 relative group">
                       <button onClick={() => removeExperience(exp.id)} className="absolute top-3 right-3 p-1 text-slate-300 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-all rounded"><Trash2 className="w-4 h-4" /></button>
                       <div className="grid grid-cols-2 gap-3 mb-3 pr-8">
                         <div><label className={lbl}>Company</label><input type="text" value={exp.company} onChange={(e) => setExpField(exp.id, 'company', e.target.value)} className={inp} placeholder="Company name" /></div>
@@ -496,10 +448,6 @@ export function ResumeBuilder() {
                       </div>
                       <div className="flex items-center justify-between mb-2">
                         <label className={lbl}>Accomplishments</label>
-                        <button onClick={() => handleEnhanceOne(exp.id)} disabled={st === 'loading'} className={`flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-md transition-all disabled:opacity-60 ${st === 'done' ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : st === 'error' ? 'bg-rose-50 text-rose-600 border border-rose-200' : 'bg-indigo-50 text-indigo-600 border border-indigo-200 hover:bg-indigo-100'}`}>
-                          {st === 'loading' ? <Loader2 className="w-3 h-3 animate-spin" /> : st === 'done' ? <CheckCircle2 className="w-3 h-3" /> : <Wand2 className="w-3 h-3" />}
-                          {st === 'loading' ? 'Enhancing…' : st === 'done' ? 'Enhanced!' : st === 'error' ? 'Failed' : 'Enhance with AI'}
-                        </button>
                       </div>
                       <div className="space-y-2">
                         {exp.bullets.map((bullet, bIdx) => (
@@ -517,9 +465,8 @@ export function ResumeBuilder() {
                           <input type="text" value={exp.technologiesUsed ?? ''} onChange={(e) => setExpField(exp.id, 'technologiesUsed', e.target.value)} className={inp} placeholder="e.g. React, Node.js, PostgreSQL, AWS" />
                         </div>
                       )}
-                    </div>
-                  );
-                })}
+                  </div>
+                ))}
               </div>
             </Section>
 
